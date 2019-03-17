@@ -1,0 +1,125 @@
+---
+output: github_document
+always_allow_html: yes
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+# KableOne
+
+The goal of KableOne is to make it easy for analysts to include a Table 1 object in both LaTeX and html markdown documents. I made this package because I was unable to get the html tables I wanted from the existing table one R packages. Notably, this package has far fewer features than the outstanding TableOne package, but it can get a readable Table 1 object into a markdown document with less effort.
+
+## Installation
+
+You can install the latest version of KableOne from github with:
+
+``` r
+devtools::install_github('bcjaeger/KableOne')
+```
+
+## Example
+
+This example shows the basic elements of KableOne. First, we apply some aesthetic changes to the data:
+
+```{r example}
+
+library(labelled)
+library(tidyverse)
+library(survival)
+library(kableExtra)
+library(KableOne)
+
+data = pbc %>%
+  dplyr::select(
+    age, sex, status, trt, stage, ascites, bili, edema, albumin
+  ) %>%
+  dplyr::mutate(
+    status=factor(
+      status, levels = c(0:2),
+      labels = c("Censored", "Transplant", "Dead")
+    ),
+    stage = factor(
+      stage, levels = c(1:4),
+      labels = c("One", "Two", "Three", "Four")
+    ),
+    trt=factor(
+      trt, levels=c(1:2),
+      labels = c("Drug A", "Drug B")
+    ),
+    ascites=factor(
+      ascites, levels=c(0:1),
+      labels = c("No", "Yes")
+    ),
+    sex = fct_recode(
+      sex,
+      'Male'='m',
+      'Female'='f'
+    ),
+    edema = factor(
+      edema,
+      levels=c(0, 0.5, 1),
+      labels=c("None", "A little", "Lots")
+    )
+  ) 
+```
+
+Next, we label the columns of the data. These labels will be passed along when our table is made.
+
+```{r}
+
+data = data %>%
+  set_variable_labels(
+    status = "Status at last contact",
+    trt = "Treatment group",
+    age = 'Age, years',
+    sex = 'Sex at birth',
+    ascites = 'Ascites',
+    bili = 'Bilirubin levels, mg/dl',
+    edema = 'Is there Edema?'
+  ) %>%
+  set_variable_groups(
+    Outcomes = c('status'),
+    Exposures = c('ascites','bili','edema','trt','albumin','stage')
+  ) 
+```
+
+Now we can apply the `tibble_one` function to get an object that we can pass along to an Rmarkdown document. 
+
+```{r}
+
+tbl_one = data %>%
+  tibble_one(
+    strat='trt',
+    include.allcats = TRUE,
+    include.freq = FALSE,
+    include.pval = TRUE
+  )
+
+```
+
+Last step, we pass `tbl_one` into the `kibble_one` function, which provides a couple of nice formatting procedures to make the data look like the type of Table 1 that you may see in a published article.
+
+```{r}
+
+kibble_one(
+  tbl_one,
+  use.groups = TRUE
+) %>%
+  kable_styling(
+    position = 'center',
+    bootstrap_options = c('striped')
+  ) %>% 
+  footnote(
+    general = 'Table values are mean(sd) and percent for continuous and categorical variables, respectively'
+  )
+
+
+```
