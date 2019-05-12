@@ -4,14 +4,16 @@
 \alias{tibble_one}
 \title{make a tidy data frame with table one information}
 \usage{
-tibble_one(data, strat = NULL, row.vars = NULL, include.pval = TRUE,
-  include.freq = FALSE, include.allcats = FALSE,
+tibble_one(data, strat = NULL, by = NULL, row.vars = NULL,
+  include.pval = TRUE, include.freq = FALSE, include.allcats = FALSE,
   include.missinf = FALSE)
 }
 \arguments{
 \item{data}{a data frame}
 
-\item{strat}{a character vector indicating the column name in data that will be used to stratify the table}
+\item{strat}{a character value indicating the column name in data that will be used to stratify the table}
+
+\item{by}{a character value indicating the column name in data that will be used to split the table into groups, prior to stratification.}
 
 \item{row.vars}{a character vector indicating column names of row variables in the table. If unspecified, all columns are used.}
 

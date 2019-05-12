@@ -4,6 +4,7 @@
 #' @param ... arguments passed to kable function
 #' @param format character, format for printing
 #' @param use.groups T/F, should rows be grouped?
+#' @param footer_notation one of `number`, `alphabet`, `symbol` and `none`
 #' @export
 #' @importFrom dplyr 'arrange' 'mutate' 'mutate_if'
 #' @importFrom knitr 'kable'
@@ -16,17 +17,20 @@ kibble_one <- function(
   object,
   format=NULL,
   use.groups=TRUE,
+  footer_notation = 'symbol',
   ...
 ){
 
   # for CRAN
 
-  variable = . = group = NULL
+  variable = . = group = value = key = NULL
 
   if(is.null(format)) format = getOption("knitr.table.format")
 
   pvals_in_table <- isTRUE(object$table_opts$pval)
   using_all_cats <- isTRUE(object$table_opts$allcats)
+
+  if(all(object$table_data$group=='None')) use.groups = FALSE
 
   if(isFALSE(use.groups)){
     object$kable_data %<>% dplyr::arrange(variable)
@@ -49,23 +53,78 @@ kibble_one <- function(
 
   }
 
-
   if(!is.null(object$strat_data)){
 
-    header <- if(pvals_in_table){
-      c(2, object$strat_data$n_groups, 1) %>%
-        set_names(
-          c(" ", object$strat_data$label, " ")
+    if(!is.null(object$table_opts$by)){
+
+      header <- if(pvals_in_table){
+        c(2,
+          rep(object$strat_data$n_groups, object$strat_data$n_by),
+          1
+        ) %>%
+          set_names(
+            c(" ",
+              rep(object$strat_data$label[1], object$strat_data$n_by),
+              " ")
+          )
+      } else {
+        c(2, rep(object$strat_data$n_groups, object$strat_data$n_by)) %>%
+          set_names(
+            c(" ", rep(object$strat_data$label[1], object$strat_data$n_by))
+          )
+      }
+
+      midder_labs <- if(format=='html'){
+        paste0(
+          names(object$strat_data$by_table),
+          "<br/>","(N = ",
+          object$strat_data$by_table,')'
         )
+      } else {
+        names(object$strat_data$by_table)
+      }
+
+
+      midder_length <- rep(
+        object$strat_data$n_groups,
+        object$strat_data$n_by,
+      )
+
+      midder <- if(pvals_in_table){
+        c(2, midder_length, 1) %>%
+        set_names(c(" ", midder_labs, " "))
+      } else {
+        c(2, midder_length) %>%
+          set_names(c(" ", midder_labs))
+      }
+
+      topper <- if(pvals_in_table){
+        c(2, prod(midder_length), 1) %>%
+          set_names(c(" ", object$strat_data$label[2], " "))
+      } else {
+        c(2, prod(midder_length)) %>%
+          set_names(c(" ", object$strat_data$label[2]))
+      }
+
     } else {
-      c(2, object$strat_data$n_groups) %>%
-        set_names(
-          c(" ", object$strat_data$label)
-        )
+
+      header <- if(pvals_in_table){
+        c(2, object$strat_data$n_groups, 1) %>%
+          set_names(
+            c(" ", object$strat_data$label, " ")
+          )
+      } else {
+        c(2, object$strat_data$n_groups) %>%
+          set_names(
+            c(" ", object$strat_data$label)
+          )
+      }
+
     }
 
-  }
 
+
+  }
 
   k1 <- object$kable_data %>%
     dplyr::mutate_if(is.factor, as.character)
@@ -75,25 +134,101 @@ kibble_one <- function(
     k1 %<>%
       dplyr::mutate(
         labels = case_when(
-          labels == 'Yes' ~ capitalize(variable),
+          labels %in% c('Y','Yes') ~ capitalize(variable),
           TRUE ~ labels
         )
       )
 
   }
 
+  repair_index <- grepl(pattern = "_._", x = names(k1))
+  names_need_repairing <- any(repair_index)
+
+  if(names_need_repairing){
+
+    names_to_repair <- names(k1)[repair_index]
+
+    repaired_names <- names_to_repair %>%
+      strsplit(split = "_._") %>%
+      purrr::map_chr(~.x[1])
+
+    names_to_repair %<>% set_names(repaired_names)
+
+  }
+
+  # format column names to have n=yy on the bottom
+  # this only works for html tables
+  if(format == 'html'){
+
+    n_obs <- k1 %>%
+      dplyr::filter(labels == 'No. of observations') %>%
+      dplyr::select(-c(group, variable, labels)) %>%
+      tidyr::gather() %>%
+      mutate(
+        value = case_when(
+          value != "" ~ paste0(key, '<br/>', '(N = ',value,')'),
+          TRUE ~ value
+        )
+      ) %>%
+      dplyr::select(value, key) %>%
+      tibble::deframe()
+
+    if(names_need_repairing){
+      for(i in 1:length(names_to_repair)){
+        names(n_obs) <- gsub(
+          pattern = names_to_repair[i],
+          replacement = repaired_names[i],
+          x = names(n_obs),
+          fixed = TRUE
+        )
+      }
+    }
+
+    k1 %<>%
+      dplyr::filter(labels != 'No. of observations') %>%
+      dplyr::select(
+        ` ` = labels, !!n_obs
+      )
+
+    # need to filter original data for consistency
+    object$kable_data %<>%
+      dplyr::filter(labels != 'No. of observations')
+
+  } else if(format == 'latex'){
+
+    # remove group/variable columns
+    # rename remaining columns for printing
+    k1 %<>%
+      dplyr::select(
+        ` ` = labels,
+        dplyr::everything(),
+        -c(group, variable)
+      )
+
+    if(names_need_repairing){
+      k1 %<>%
+        dplyr::rename(
+          !!names_to_repair
+        )
+    }
+
+  }
+
   k1 %<>%
-    dplyr::select(
-      ` ` = labels,
-      dplyr::everything(),
-      -c(group,variable)
-    ) %>%
     knitr::kable(
-      align = c("l",rep("c",ncol(.)-1)),
-      ...
+      align = c("l",rep("c",ncol(.)-1)), escape = FALSE#, ...
     ) %>%
     kableExtra::add_indent(
       positions = find_indent_rows(object$kable_data$variable)
+    ) %>%
+    kableExtra::add_footnote(
+      label = c(object$table_desc),
+      threeparttable = TRUE,
+      notation = footer_notation
+    ) %>%
+    kableExtra::add_footnote(
+      label = object$table_abbr,
+      notation = 'none'
     )
 
   if(use.groups){
@@ -112,10 +247,27 @@ kibble_one <- function(
   }
 
   if(!is.null(object$strat_data)){
+
     k1 %<>%
       kableExtra::add_header_above(
         header = header, bold = TRUE
       )
+
+    if(!is.null(object$table_opts$by)){
+
+      k1 %<>%
+        kableExtra::add_header_above(
+          header = midder,
+          bold = TRUE,
+          escape = FALSE
+        ) %>%
+        kableExtra::add_header_above(
+          header = topper,
+          bold = TRUE
+        )
+
+    }
+
   }
 
   k1
