@@ -143,7 +143,7 @@ tibble_one <- function(
           }
         }
       ),
-      abbr = purrr::map_chr(
+      abbr = purrr::map(
         variable,
         ~ {
           if(!is.null(attr(tbl_data[[.x]],'abbrs'))){
@@ -162,8 +162,12 @@ tibble_one <- function(
           if(.type=='factor'){
             if(include.allcats | .n_unique > 2){
               c(.lab, levels(.tbl_data))
-            } else if(.n_unique==2) {
-              levels(.tbl_data)[2]
+            } else if(.n_unique==2){
+              if(levels(.tbl_data)[2]=='Yes'|levels(.tbl_data)[2]=='Y'){
+                .lab
+              } else {
+                levels(.tbl_data)[2]
+              }
             }
           } else {
             .lab
@@ -178,7 +182,10 @@ tibble_one <- function(
     dplyr::select(variable, label, abbr, unit, type, labels, group)
 
   table_abbrs <- meta_data$abbr %>%
-    na.omit() %>%
+    purrr::discard(is.na) %>%
+    unlist() %>%
+    c(attr(data[[strat]],'abbr')) %>%
+    sort() %>%
     paste(collapse = ', ')
 
   if(any(meta_data$type == 'character')){

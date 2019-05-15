@@ -11,8 +11,6 @@
 #' @importFrom kableExtra 'group_rows' 'add_indent' 'add_header_above'
 #'
 
-
-
 kibble_one <- function(
   object,
   format=NULL,
