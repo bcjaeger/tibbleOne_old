@@ -6,7 +6,7 @@
 \usage{
 tibble_one(data, strat = NULL, by = NULL, row.vars = NULL,
   include.pval = TRUE, include.freq = FALSE, include.allcats = FALSE,
-  include.missinf = FALSE)
+  footer_notation = "symbol", include.missinf = FALSE)
 }
 \arguments{
 \item{data}{a data frame}
@@ -22,6 +22,8 @@ tibble_one(data, strat = NULL, by = NULL, row.vars = NULL,
 \item{include.freq}{T/F, should frequency values be included for categorical variables?}
 
 \item{include.allcats}{T/F, should all categories be included for categorical variables?}
+
+\item{footer_notation}{one of `number`, `alphabet`, `symbol` and `none`}
 
 \item{include.missinf}{T/F, should the table include information on percent of missing values?}
 }

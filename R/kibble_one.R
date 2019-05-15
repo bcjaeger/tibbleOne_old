@@ -4,7 +4,6 @@
 #' @param ... arguments passed to kable function
 #' @param format character, format for printing
 #' @param use.groups T/F, should rows be grouped?
-#' @param footer_notation one of `number`, `alphabet`, `symbol` and `none`
 #' @export
 #' @importFrom dplyr 'arrange' 'mutate' 'mutate_if'
 #' @importFrom knitr 'kable'
@@ -15,7 +14,6 @@ kibble_one <- function(
   object,
   format=NULL,
   use.groups=TRUE,
-  footer_notation = 'symbol',
   ...
 ){
 
@@ -27,6 +25,7 @@ kibble_one <- function(
 
   pvals_in_table <- isTRUE(object$table_opts$pval)
   using_all_cats <- isTRUE(object$table_opts$allcats)
+  footer_notation = object$table_foot_notation
 
   if(all(object$table_data$group=='None')) use.groups = FALSE
 
@@ -220,12 +219,14 @@ kibble_one <- function(
       positions = find_indent_rows(object$kable_data$variable)
     ) %>%
     kableExtra::add_footnote(
-      label = c(object$table_desc),
+      label = c(object$table_desc, object$table_note),
       threeparttable = TRUE,
+      escape = FALSE,
       notation = footer_notation
     ) %>%
     kableExtra::add_footnote(
       label = object$table_abbr,
+      escape = FALSE,
       notation = 'none'
     )
 
@@ -248,7 +249,9 @@ kibble_one <- function(
 
     k1 %<>%
       kableExtra::add_header_above(
-        header = header, bold = TRUE
+        header = header,
+        bold = TRUE,
+        escape = FALSE
       )
 
     if(!is.null(object$table_opts$by)){
@@ -261,7 +264,8 @@ kibble_one <- function(
         ) %>%
         kableExtra::add_header_above(
           header = topper,
-          bold = TRUE
+          bold = TRUE,
+          escape = FALSE
         )
 
     }

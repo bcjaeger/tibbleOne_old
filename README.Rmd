@@ -116,9 +116,6 @@ kibble_one(
   kable_styling(
     position = 'center',
     bootstrap_options = c('striped')
-  ) %>% 
-  footnote(
-    general = 'Table values are mean(sd) and percent for continuous and categorical variables, respectively'
   )
 
 

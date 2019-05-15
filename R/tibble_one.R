@@ -7,6 +7,7 @@
 #' @param include.pval T/F, should the table include a column for p-values?
 #' @param include.freq T/F, should frequency values be included for categorical variables?
 #' @param include.allcats T/F, should all categories be included for categorical variables?
+#' @param footer_notation one of `number`, `alphabet`, `symbol` and `none`
 #' @param include.missinf T/F, should the table include information on percent of missing values?
 #' @export
 #' @importFrom dplyr 'group_by' 'bind_rows' 'case_when'
@@ -17,6 +18,8 @@
 #' @importFrom tibble 'tibble'
 #' @importFrom tidyr 'spread' 'unnest' 'nest'
 #' @importFrom stats 'na.omit'
+#' @importFrom kableExtra 'footnote_marker_number' 'footnote_marker_symbol' 'footnote_marker_alphabet'
+#' @importFrom magrittr 'add'
 #'
 
 tibble_one <- function(
@@ -27,12 +30,13 @@ tibble_one <- function(
   include.pval=TRUE,
   include.freq=FALSE,
   include.allcats=FALSE,
+  footer_notation = 'symbol',
   include.missinf=FALSE
 ){
 
   .strat = label = n_unique = name = tbl_one = tbl_val = NULL
   . = type = value = variable = group = NULL
-  value = key = abbr = unit = NULL
+  value = key = abbr = unit = note = NULL
 
   if(is.null(row.vars)){
     row.vars <- setdiff(names(data),strat)
@@ -153,9 +157,19 @@ tibble_one <- function(
           }
         }
       ),
+      note = purrr::map(
+        variable,
+        ~ {
+          if(!is.null(attr(tbl_data[[.x]],'notes'))){
+            attr(tbl_data[[.x]],'notes')
+          } else {
+            NA_character_
+          }
+        }
+      ),
       labels = purrr::pmap(
-        list(variable, tbl_data, type, label, n_unique),
-        .f = function(.variable, .tbl_data, .type, .label, .n_unique){
+        list(variable, tbl_data, type, label, n_unique, note),
+        .f = function(.variable, .tbl_data, .type, .label, .n_unique, .note){
 
           .lab = if(.label=='None') capitalize(.variable) else .label
 
@@ -179,7 +193,39 @@ tibble_one <- function(
     dplyr::filter(
       variable != '.strat'
     ) %>%
-    dplyr::select(variable, label, abbr, unit, type, labels, group)
+    dplyr::select(variable, label, abbr, unit, type, labels, group, note)
+
+  footnote_marker_fun <- if(footer_notation=='symbol'){
+    footnote_marker_symbol
+  } else if(footer_notation == 'number'){
+    footnote_marker_number
+  } else if(footer_notation == 'alphabet'){
+    footnote_marker_alphabet
+  }
+
+  note_fill_indx <- !is.na(meta_data$note)
+  note_fill_cntr <- 2
+
+  # Add footnote for column spanning variable
+  # This would be nice but throws an error in doc_parse_raw
+  # if(!is.null(attr(data[[strat]], 'notes'))){
+  #
+  #   strat_data$label %<>%
+  #     paste0(footnote_marker_fun(note_fill_cntr))
+  #
+  #   note_fill_cntr %<>% add(1)
+  #
+  # }
+
+  for(i in which(note_fill_indx)){
+
+    meta_data$labels[[i]][1] %<>%
+      paste0(footnote_marker_fun(note_fill_cntr))
+
+    note_fill_cntr %<>% add(1)
+
+  }
+
 
   table_abbrs <- meta_data$abbr %>%
     purrr::discard(is.na) %>%
@@ -187,6 +233,11 @@ tibble_one <- function(
     c(attr(data[[strat]],'abbr')) %>%
     sort() %>%
     paste(collapse = ', ')
+
+  table_notes <- meta_data$note %>%
+    purrr::discard(is.na) %>%
+    unlist() %>%
+    c(attr(data[[strat]],'note'), .)
 
   if(any(meta_data$type == 'character')){
 
@@ -261,6 +312,8 @@ tibble_one <- function(
     list(
       table_data = meta_data,
       table_abbr = table_abbrs,
+      table_note = table_notes,
+      table_foot_notation = footer_notation,
       table_desc = table_value_description,
       table_opts = list(
         by       = by,

@@ -4,8 +4,7 @@
 \alias{kibble_one}
 \title{pass a tibble_one object into kable}
 \usage{
-kibble_one(object, format = NULL, use.groups = TRUE,
-  footer_notation = "symbol", ...)
+kibble_one(object, format = NULL, use.groups = TRUE, ...)
 }
 \arguments{
 \item{object}{a tibble_one object}
@@ -13,8 +12,6 @@ kibble_one(object, format = NULL, use.groups = TRUE,
 \item{format}{character, format for printing}
 
 \item{use.groups}{T/F, should rows be grouped?}
-
-\item{footer_notation}{one of `number`, `alphabet`, `symbol` and `none`}
 
 \item{...}{arguments passed to kable function}
 }
