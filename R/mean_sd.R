@@ -7,12 +7,9 @@
 mean_sd<-function(variable){
 
   paste0(
-    adapt_round(
-      mean(variable, na.rm=TRUE)
-    ),' (',
-    adapt_round(
-      sd(variable, na.rm=TRUE)
-    ),')'
+    adapt_round(mean(variable, na.rm = TRUE)), ' (',
+    adapt_round(sd(variable, na.rm = TRUE)), ')'
   )
 
 }
+

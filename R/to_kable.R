@@ -4,16 +4,29 @@
 #' @param ... arguments passed to kable function
 #' @param format character, format for printing
 #' @param use.groups T/F, should rows be grouped?
+#' @param include_1st_header T/F, should bottom header be included?
+#' @param include_2nd_header T/F, should middle header be included?
+#' @param include_3rd_header T/F, should top header be included?
 #' @export
 #' @importFrom dplyr 'arrange' 'mutate' 'mutate_if'
 #' @importFrom knitr 'kable'
 #' @importFrom kableExtra 'group_rows' 'add_indent' 'add_header_above'
 #'
 
-kibble_one <- function(
+# object = tbl_one
+# format=NULL
+# use.groups=TRUE
+# include_1st_header = TRUE
+# include_2nd_header = TRUE
+# include_3rd_header = TRUE
+
+to_kable <- function(
   object,
   format=NULL,
   use.groups=TRUE,
+  include_1st_header = TRUE,
+  include_2nd_header = TRUE,
+  include_3rd_header = TRUE,
   ...
 ){
 
@@ -25,7 +38,7 @@ kibble_one <- function(
 
   pvals_in_table <- isTRUE(object$table_opts$pval)
   using_all_cats <- isTRUE(object$table_opts$allcats)
-  footer_notation = object$table_foot_notation
+  footer_notation <- object$table_foot_notation
 
   if(all(object$table_data$group=='None')) use.groups = FALSE
 
@@ -96,10 +109,10 @@ kibble_one <- function(
       }
 
       topper <- if(pvals_in_table){
-        c(2, prod(midder_length), 1) %>%
+        c(2, sum(midder_length), 1) %>%
           set_names(c(" ", object$strat_data$label[2], " "))
       } else {
-        c(2, prod(midder_length)) %>%
+        c(2, sum(midder_length)) %>%
           set_names(c(" ", object$strat_data$label[2]))
       }
 
@@ -203,10 +216,7 @@ kibble_one <- function(
       )
 
     if(names_need_repairing){
-      k1 %<>%
-        dplyr::rename(
-          !!names_to_repair
-        )
+      k1 %<>% dplyr::rename(!!names_to_repair)
     }
 
   }
@@ -247,26 +257,34 @@ kibble_one <- function(
 
   if(!is.null(object$strat_data)){
 
-    k1 %<>%
-      kableExtra::add_header_above(
-        header = header,
-        bold = TRUE,
-        escape = FALSE
-      )
-
-    if(!is.null(object$table_opts$by)){
-
+    if(include_1st_header){
       k1 %<>%
         kableExtra::add_header_above(
-          header = midder,
-          bold = TRUE,
-          escape = FALSE
-        ) %>%
-        kableExtra::add_header_above(
-          header = topper,
+          header = header,
           bold = TRUE,
           escape = FALSE
         )
+    }
+
+    if(!is.null(object$table_opts$by)){
+
+      if(include_2nd_header){
+        k1 %<>%
+          kableExtra::add_header_above(
+            header = midder,
+            bold = TRUE,
+            escape = FALSE
+          )
+      }
+
+      if(include_3rd_header){
+        k1 %<>%
+          kableExtra::add_header_above(
+            header = topper,
+            bold = TRUE,
+            escape = FALSE
+          )
+      }
 
     }
 

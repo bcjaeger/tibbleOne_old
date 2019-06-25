@@ -27,14 +27,23 @@ aesthetic changes to the data:
 
 library(labelled)
 library(tidyverse)
-#> -- Attaching packages ------------------------------------------------ tidyverse 1.2.1 --
-#> v tibble  2.1.1          v purrr   0.3.2     
-#> v tidyr   0.8.3.9000     v dplyr   0.8.0.1   
-#> v readr   1.3.1          v stringr 1.4.0     
-#> v tibble  2.1.1          v forcats 0.4.0
-#> -- Conflicts --------------------------------------------------- tidyverse_conflicts() --
+#> -- Attaching packages ---------------------------------------------- tidyverse 1.2.1 --
+#> v tibble  2.1.2     v purrr   0.3.2
+#> v tidyr   0.8.3     v dplyr   0.8.1
+#> v readr   1.3.1     v stringr 1.4.0
+#> v tibble  2.1.2     v forcats 0.4.0
+#> -- Conflicts ------------------------------------------------- tidyverse_conflicts() --
 #> x dplyr::filter() masks stats::filter()
 #> x dplyr::lag()    masks stats::lag()
+library(magrittr)
+#> 
+#> Attaching package: 'magrittr'
+#> The following object is masked from 'package:purrr':
+#> 
+#>     set_names
+#> The following object is masked from 'package:tidyr':
+#> 
+#>     extract
 library(survival)
 library(kableExtra)
 #> 
@@ -106,23 +115,23 @@ pass along to an Rmarkdown document.
 
 tbl_one = data %>%
   tibble_one(
-    strat='trt',
-    include.allcats = TRUE,
+    formula = ~ . | trt,
+    include.allcats = FALSE,
     include.freq = FALSE,
     include.pval = TRUE
   )
 ```
 
-Last step, we pass `tbl_one` into the `kibble_one` function, which
+Last step, we pass `tbl_one` into the `to_kable()` function, which
 provides a couple of nice formatting procedures to make the data look
 like the type of Table 1 that you may see in a published article.
 
 ``` r
 
-kibble_one(
-  tbl_one,
-  use.groups = TRUE
-) %>%
+tbl_one %>% 
+  to_kable(
+    use.groups = TRUE
+  ) %>%
   kable_styling(
     position = 'center',
     bootstrap_options = c('striped')
@@ -229,66 +238,6 @@ Age, years
 
 <td style="text-align:left;">
 
-Sex at birth
-
-</td>
-
-<td style="text-align:center;">
-
-</td>
-
-<td style="text-align:center;">
-
-</td>
-
-<td style="text-align:center;">
-
-</td>
-
-<td style="text-align:center;">
-
-0.421
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-
-Male
-
-</td>
-
-<td style="text-align:center;">
-
-10.5
-
-</td>
-
-<td style="text-align:center;">
-
-13.3
-
-</td>
-
-<td style="text-align:center;">
-
-9.74
-
-</td>
-
-<td style="text-align:center;">
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-
 Female
 
 </td>
@@ -313,11 +262,13 @@ Female
 
 <td style="text-align:center;">
 
+0.421
+
 </td>
 
 </tr>
 
-<tr grouplength="14">
+<tr grouplength="12">
 
 <td colspan="5" style="border-bottom: 1px solid;">
 
@@ -493,66 +444,6 @@ Ascites
 
 <td style="text-align:center;">
 
-</td>
-
-<td style="text-align:center;">
-
-</td>
-
-<td style="text-align:center;">
-
-</td>
-
-<td style="text-align:center;">
-
-0.567
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left; padding-left: 4em;" indentlevel="2">
-
-No
-
-</td>
-
-<td style="text-align:center;">
-
-92.3
-
-</td>
-
-<td style="text-align:center;">
-
-91.1
-
-</td>
-
-<td style="text-align:center;">
-
-93.5
-
-</td>
-
-<td style="text-align:center;">
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left; padding-left: 4em;" indentlevel="2">
-
-Yes
-
-</td>
-
-<td style="text-align:center;">
-
 7.69
 
 </td>
@@ -570,6 +461,8 @@ Yes
 </td>
 
 <td style="text-align:center;">
+
+0.567
 
 </td>
 

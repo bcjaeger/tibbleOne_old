@@ -24,5 +24,8 @@ Imports:
     purrr,
     magrittr,
     knitr,
+    survival,
+    stringr,
     kableExtra,
+    flextable,
     tibble

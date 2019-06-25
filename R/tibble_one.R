@@ -1,6 +1,7 @@
 
 #' make a tidy data frame with table one information
 #' @param data a data frame
+#' @param formula an optional formula object. The left hand side of the formula should be blank. The right hand side of the formula should contain row variables for the table. The '|' symbol can be used to include stratifying variables. If this option is used, no more than two stratifying variables should be used, and they must be separated by a * symbol. If formula is used, the strat, by, and row.vars inputs are ignored.
 #' @param strat a character value indicating the column name in data that will be used to stratify the table
 #' @param by a character value indicating the column name in data that will be used to split the table into groups, prior to stratification.
 #' @param row.vars a character vector indicating column names of row variables in the table. If unspecified, all columns are used.
@@ -20,10 +21,95 @@
 #' @importFrom stats 'na.omit'
 #' @importFrom kableExtra 'footnote_marker_number' 'footnote_marker_symbol' 'footnote_marker_alphabet'
 #' @importFrom magrittr 'add'
+#' @importFrom stringr 'str_detect' 'fixed'
+#' @examples
+#' library(labelled)
+#' library(dplyr)
+#' library(forcats)
+#' library(survival)
+#' library(kableExtra)
+#' library(flextable)
+#' library(KableOne)
 #'
+#' data = pbc %>%
+#'   dplyr::select(
+#'     age, sex, status, trt, stage, ascites, bili, edema, albumin
+#'   ) %>%
+#'   dplyr::mutate(
+#'     status=factor(
+#'       status, levels = c(0:2),
+#'       labels = c("Censored", "Transplant", "Dead")
+#'     ),
+#'     stage = factor(
+#'       stage, levels = c(1:4),
+#'       labels = c("One", "Two", "Three", "Four")
+#'     ),
+#'     trt=factor(
+#'       trt, levels=c(1:2),
+#'       labels = c("Drug A", "Drug B")
+#'     ),
+#'     ascites=factor(
+#'       ascites, levels=c(0:1),
+#'       labels = c("No", "Yes")
+#'     ),
+#'     sex = fct_recode(
+#'       sex,
+#'       'Male'='m',
+#'       'Female'='f'
+#'     ),
+#'     edema = factor(
+#'       edema,
+#'       levels=c(0, 0.5, 1),
+#'       labels=c("None", "A little", "Lots")
+#'     )
+#'   ) %>%
+#'   set_variable_labels(
+#'     status = "Status at last contact",
+#'     trt = "Treatment group",
+#'     age = 'Age, years',
+#'     sex = 'Sex at birth',
+#'     ascites = 'Ascites',
+#'     bili = 'Bilirubin levels, mg/dl',
+#'     edema = 'Is there Edema?'
+#'   ) %>%
+#'   set_variable_groups(
+#'     Outcomes = c('status'),
+#'     Exposures = c('ascites','bili','edema','trt','albumin','stage')
+#'   )
+#'
+#' tbl_one = data %>%
+#'   tibble_one(
+#'     formula = ~ . | trt,
+#'     include.allcats = FALSE,
+#'     include.freq = FALSE,
+#'     include.pval = TRUE
+#'   )
+#'
+#' tbl_one %>%
+#'   to_kable(format = 'html') %>%
+#'   kable_styling(
+#'     position = 'center',
+#'     bootstrap_options = c('striped')
+#'   )
+#'
+#' tbl_one %>%
+#'   to_word(use.groups = FALSE)
+
+# data = data
+# formula = ~ .
+# strat = NULL
+# by = NULL
+# row.vars = NULL
+# include.pval=TRUE
+# include.freq=FALSE
+# include.allcats=FALSE
+# footer_notation = 'symbol'
+# include.missinf=FALSE
+
 
 tibble_one <- function(
   data,
+  formula = NULL,
   strat = NULL,
   by = NULL,
   row.vars = NULL,
@@ -38,8 +124,59 @@ tibble_one <- function(
   . = type = value = variable = group = NULL
   value = key = abbr = unit = note = NULL
 
-  if(is.null(row.vars)){
-    row.vars <- setdiff(names(data),strat)
+  if(!is.null(formula)){
+
+    formula_rhs <-
+      paste(formula)[length(formula)] %>%
+      str_split_trim(pattern = '|')
+
+    strat = if(length(formula_rhs) < 2){
+      NULL
+    } else {
+      str_split_trim(formula_rhs[2], pattern = "*")
+    }
+
+    if(length(strat) > 2){
+      stop("Too many stratifying variables", call. = FALSE)
+    }
+
+    if(length(strat)==2){
+      by = strat[2]
+      strat = strat[1]
+    } else {
+      by = NULL
+    }
+
+    for(symbol in c("+", ":","&","-")){
+      if( any(str_detect(strat, pattern = fixed(symbol))) ){
+        stop_msg <- paste(
+          symbol,
+          "should not be used for stratification.",
+          "Use * instead"
+        )
+        stop(stop_msg, call. = FALSE)
+      }
+    }
+
+    row.vars <-
+      if(formula_rhs[1] == '.'){
+        setdiff(names(data),strat)
+      } else {
+        formula_rhs[1] %>%
+          str_split(pattern = fixed("+")) %>%
+          unlist() %>%
+          trimws()
+      }
+  }
+
+  if(is.null(formula) & is.null(row.vars)){
+    row.vars = setdiff(names(data), c(strat, by))
+    #stop("Please specify formula or row.vars, strat, and by")
+  }
+
+  if(is.null(strat) & !is.null(by)){
+    strat = by
+    by = NULL
   }
 
   table_value_description <- paste(
@@ -168,9 +305,22 @@ tibble_one <- function(
         }
       ),
       labels = purrr::pmap(
-        list(variable, tbl_data, type, label, n_unique, note),
-        .f = function(.variable, .tbl_data, .type, .label, .n_unique, .note){
-
+        list(
+          variable,
+          tbl_data,
+          type,
+          label,
+          n_unique,
+          note
+        ),
+        .f = function(
+          .variable,
+          .tbl_data,
+          .type,
+          .label,
+          .n_unique,
+          .note
+        ){
           .lab = if(.label=='None') capitalize(.variable) else .label
 
           if(.type=='factor'){
@@ -193,7 +343,16 @@ tibble_one <- function(
     dplyr::filter(
       variable != '.strat'
     ) %>%
-    dplyr::select(variable, label, abbr, unit, type, labels, group, note)
+    dplyr::select(
+      variable,
+      label,
+      abbr,
+      unit,
+      type,
+      labels,
+      group,
+      note
+    )
 
   footnote_marker_fun <- if(footer_notation=='symbol'){
     footnote_marker_symbol
@@ -229,15 +388,23 @@ tibble_one <- function(
 
   table_abbrs <- meta_data$abbr %>%
     purrr::discard(is.na) %>%
-    unlist() %>%
-    c(attr(data[[strat]],'abbr')) %>%
+    unlist()
+
+  if(!is.null(strat)){
+    table_abbrs %<>% c(attr(data[[strat]],'abbr'))
+  }
+
+  table_abbrs %<>%
     sort() %>%
     paste(collapse = ', ')
 
   table_notes <- meta_data$note %>%
     purrr::discard(is.na) %>%
-    unlist() %>%
-    c(attr(data[[strat]],'note'), .)
+    unlist()
+
+  if(!is.null(strat)){
+    table_notes %<>% c(attr(data[[strat]],'note'), .)
+  }
 
   if(any(meta_data$type == 'character')){
 
@@ -247,12 +414,12 @@ tibble_one <- function(
       paste(collapse = ' -- ')
 
     out_msg <- paste(
-      "\n tibble_one expects character variables to be factors.",
+      "tibble_one expects character variables to be factors.",
       "Please inspect the following variables in the input data:",
       out_variables,
       sep= '\n'
     )
-    stop(out_msg)
+    stop(out_msg, call. = FALSE)
   }
 
   if(any(map_dbl(meta_data$labels, length)>=8)){

@@ -33,6 +33,7 @@ This example shows the basic elements of KableOne. First, we apply some aestheti
 
 library(labelled)
 library(tidyverse)
+library(magrittr)
 library(survival)
 library(kableExtra)
 library(KableOne)
@@ -69,6 +70,7 @@ data = pbc %>%
       labels=c("None", "A little", "Lots")
     )
   ) 
+
 ```
 
 Next, we label the columns of the data. These labels will be passed along when our table is made.
@@ -97,26 +99,25 @@ Now we can apply the `tibble_one` function to get an object that we can pass alo
 
 tbl_one = data %>%
   tibble_one(
-    strat='trt',
-    include.allcats = TRUE,
+    formula = ~ . | trt,
+    include.allcats = FALSE,
     include.freq = FALSE,
     include.pval = TRUE
   )
 
 ```
 
-Last step, we pass `tbl_one` into the `kibble_one` function, which provides a couple of nice formatting procedures to make the data look like the type of Table 1 that you may see in a published article.
+Last step, we pass `tbl_one` into the `to_kable()` function, which provides a couple of nice formatting procedures to make the data look like the type of Table 1 that you may see in a published article.
 
 ```{r}
 
-kibble_one(
-  tbl_one,
-  use.groups = TRUE
-) %>%
+tbl_one %>% 
+  to_kable(
+    use.groups = TRUE
+  ) %>%
   kable_styling(
     position = 'center',
     bootstrap_options = c('striped')
   )
-
 
 ```
