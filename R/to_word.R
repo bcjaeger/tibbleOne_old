@@ -1,5 +1,5 @@
 
-source("R/hline_header.R")
+# source("R/hline_header.R")
 
 #' pass a tibble_one object into flextable
 #' @param object a tibble_one object
@@ -22,7 +22,7 @@ source("R/hline_header.R")
 # include_2nd_header = TRUE
 # include_3rd_header = TRUE
 
-to_word_test <- function(
+to_word <- function(
   object,
   use_groups = TRUE,
   font_size = 12,
@@ -307,7 +307,7 @@ to_word_test <- function(
       flextable::hline_bottom(part="header", border=fp_border(width = 3)) %>%
       flextable::hline_bottom(part="body", border = fp_border(width = 3)) %>%
       hline_header(border = fp_border(width = 1.5), bottom=F) %>%
-      flextable::hline(i=group.row.id-1, j = 1, part="body", border = fp_border(width = 1.5)) %>%
+      flextable::hline(i=setdiff(group.row.id-1, c(0)), j = 1, part="body", border = fp_border(width = 1.5)) %>%
       flextable::align(
         j = 1,
         align = 'left',

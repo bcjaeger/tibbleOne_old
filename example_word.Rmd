@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = F, message = F, warning = F)
 
 ```{r example}
 
-devtools::install_github('boyiguo1/KableOne')
+#devtools::install_github('boyiguo1/KableOne')
 
 library(labelled)
 library(tidyverse)
@@ -89,7 +89,23 @@ tbl_one = data %>%
   )
 
 ```
+# With groups example
+```{r}
 
+# TODO(boyiguo1): Fix the bug that when use_groups, all the first column are bolded, should relate to the use of bold function
+  
+  
+tmp <- tbl_one %>% 
+  to_word_test(
+    use_groups = T,
+    apply_format_steps = T
+    )
+
+tmp 
+```
+
+\newpage
+# Without groups example
 ```{r}
 
 # TODO(boyiguo1): Fix the bug that when use_groups, all the first column are bolded, should relate to the use of bold function
