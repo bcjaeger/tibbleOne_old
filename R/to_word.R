@@ -1,4 +1,6 @@
 
+source("R/hline_header.R")
+
 #' pass a tibble_one object into flextable
 #' @param object a tibble_one object
 #' @param ... arguments passed to flextable function
@@ -20,7 +22,7 @@
 # include_2nd_header = TRUE
 # include_3rd_header = TRUE
 
-to_word <- function(
+to_word_test <- function(
   object,
   use_groups = TRUE,
   font_size = 12,
@@ -165,6 +167,8 @@ to_word <- function(
     }
   }
 
+  group.row.id <- NULL
+
   if(use_groups){
     k1 %<>%
       dplyr::filter(labels != 'No. of observations') %>%
@@ -204,6 +208,8 @@ to_word <- function(
     )
 
     current_group = "None"
+
+    group.row.id <- k1 %>% select(group) %>% mutate(id = 1:nrow(.)) %>% filter(group!="None") %>% group_by(group) %>% top_n(-1, id) %>% pull(id)
 
     for(i in seq_along(k1$group)){
 
@@ -295,6 +301,13 @@ to_word <- function(
 
     out %>%
       flextable::theme_box() %>%
+      flextable::border_remove() %>%
+      # Border line for header
+      flextable::hline_top(part = "header", border = fp_border(width = 3)) %>%
+      flextable::hline_bottom(part="header", border=fp_border(width = 3)) %>%
+      flextable::hline_bottom(part="body", border = fp_border(width = 3)) %>%
+      hline_header(border = fp_border(width = 1.5), bottom=F) %>%
+      flextable::hline(i=group.row.id-1, j = 1, part="body", border = fp_border(width = 1.5)) %>%
       flextable::align(
         j = 1,
         align = 'left',
@@ -325,8 +338,10 @@ to_word <- function(
         part = "header"
       ) %>%
       flextable::merge_v(part = 'header') %>%
-      flextable::fontsize(size=font_size, part = 'all') %>%
-      flextable::autofit()
+      #flextable::fontsize(size=font_size, part = 'all') %>%
+      {if(!is.null(group.row.id)) flextable::bold(., i=group.row.id, j = 1, part="body") else .}
+
+      # flextable::autofit()
 
   } else {
     out
