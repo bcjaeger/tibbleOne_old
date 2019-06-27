@@ -95,8 +95,8 @@
 #' tbl_one %>%
 #'   to_word(use.groups = FALSE)
 
-# data = data
-# formula = ~ .
+# data = analysis
+# formula = ~ . | dataset
 # strat = NULL
 # by = NULL
 # row.vars = NULL
@@ -355,11 +355,11 @@ tibble_one <- function(
     )
 
   footnote_marker_fun <- if(footer_notation=='symbol'){
-    footnote_marker_symbol
+    kableExtra::footnote_marker_symbol
   } else if(footer_notation == 'number'){
-    footnote_marker_number
+    kableExtra::footnote_marker_number
   } else if(footer_notation == 'alphabet'){
-    footnote_marker_alphabet
+    kableExtra::footnote_marker_alphabet
   }
 
   note_fill_indx <- !is.na(meta_data$note)
@@ -385,9 +385,8 @@ tibble_one <- function(
 
   }
 
-
   table_abbrs <- meta_data$abbr %>%
-    purrr::discard(is.na) %>%
+    purrr::keep(~any(!is.na(.x))) %>%
     unlist()
 
   if(!is.null(strat)){
@@ -396,10 +395,11 @@ tibble_one <- function(
 
   table_abbrs %<>%
     sort() %>%
+    map2_chr(names(.), ~paste(.y, .x, sep = ' = ')) %>%
     paste(collapse = ', ')
 
   table_notes <- meta_data$note %>%
-    purrr::discard(is.na) %>%
+    purrr::keep(~any(!is.na(.x))) %>%
     unlist()
 
   if(!is.null(strat)){
