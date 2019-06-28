@@ -23,7 +23,7 @@ library(flextable)
 library(officer)
 
 
-source("R/to_word.R")
+#source("R/to_word.R")
 
 
 data = pbc %>%
@@ -96,7 +96,7 @@ tbl_one = data %>%
   
   
 tmp <- tbl_one %>% 
-  to_word_test(
+  to_word(
     use_groups = T,
     apply_format_steps = T
     )
@@ -112,7 +112,7 @@ tmp
   
   
 tmp <- tbl_one %>% 
-  to_word_test(
+  to_word(
     use_groups = FALSE,
     apply_format_steps = T
     )
