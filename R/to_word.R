@@ -299,6 +299,9 @@ to_word <- function(
 
   if(apply_format_steps){
 
+    even <- seq_len(nrow(k1))%%2 == 0
+    odd <- !even
+
     out %>%
       flextable::theme_box() %>%
       flextable::border_remove() %>%
@@ -306,7 +309,11 @@ to_word <- function(
       flextable::hline_top(part = "header", border = fp_border(width = 3)) %>%
       flextable::hline_bottom(part="header", border=fp_border(width = 3)) %>%
       flextable::hline_bottom(part="body", border = fp_border(width = 3)) %>%
-      hline_header(border = fp_border(width = 1.5), bottom=F) %>%
+      hline_header(border = fp_border( width = 1.5), bottom=F) %>%
+      # Set background colors for rows
+      flextable::bg(i = odd, bg = "#EFEFEF", part = "body") %>%
+      flextable::bg(i = even, bg = "transparent", part = "body") %>%
+      {if(!is.null(group.row.id)) flextable::bg(x=., i = group.row.id, bg = "#CFCFCF", part = "body") else .} %>%
       flextable::hline(i=setdiff(group.row.id-1, c(0)), j = 1, part="body", border = fp_border(width = 1.5)) %>%
       flextable::align(
         j = 1,

@@ -92,9 +92,6 @@ tbl_one = data %>%
 # With groups example
 ```{r}
 
-# TODO(boyiguo1): Fix the bug that when use_groups, all the first column are bolded, should relate to the use of bold function
-  
-  
 tmp <- tbl_one %>% 
   to_word(
     use_groups = T,
