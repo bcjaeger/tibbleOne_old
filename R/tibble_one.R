@@ -96,7 +96,7 @@
 #'   to_word(use.groups = FALSE)
 
 # data = analysis
-# formula = ~ . | dataset
+# formula = ~ . | sex
 # strat = NULL
 # by = NULL
 # row.vars = NULL
@@ -193,6 +193,9 @@ tibble_one <- function(
     Overall = nrow(data)
   )
 
+  # make adjustments to table parameters
+  # based on whether or not a stratification
+  # variable was specified
   if(!is.null(strat)){
 
     strat_labs <- if(!is.null(var_label(data[[strat]]))){
@@ -267,11 +270,7 @@ tibble_one <- function(
         tbl_data,
         .f=function(.tbl_data){
           vlab <- var_label(.tbl_data)
-          if(is.null(vlab)){
-            'None'
-          } else {
-            vlab
-          }
+          if(is.null(vlab)){'None'} else {vlab}
         }
       ),
       unit = purrr::map_chr(
@@ -376,14 +375,15 @@ tibble_one <- function(
   #
   # }
 
-  for(i in which(note_fill_indx)){
-
-    meta_data$labels[[i]][1] %<>%
-      paste0(footnote_marker_fun(note_fill_cntr))
-
-    note_fill_cntr %<>% add(1)
-
-  }
+  # move to to_kable
+  # for(i in which(note_fill_indx)){
+  #
+  #   meta_data$labels[[i]][1] %<>%
+  #     paste0(footnote_marker_fun(note_fill_cntr))
+  #
+  #   note_fill_cntr %<>% add(1)
+  #
+  # }
 
   table_abbrs <- meta_data$abbr %>%
     purrr::keep(~any(!is.na(.x))) %>%
@@ -394,8 +394,8 @@ tibble_one <- function(
   }
 
   table_abbrs %<>%
-    sort() %>%
     map2_chr(names(.), ~paste(.y, .x, sep = ' = ')) %>%
+    sort() %>%
     paste(collapse = ', ')
 
   table_notes <- meta_data$note %>%
