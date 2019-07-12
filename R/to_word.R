@@ -1,4 +1,6 @@
 
+# source("R/hline_header.R")
+
 #' pass a tibble_one object into flextable
 #' @param object a tibble_one object
 #' @param ... arguments passed to flextable function
@@ -167,6 +169,8 @@ to_word <- function(
     }
   }
 
+  group.row.id <- NULL
+
   if(use_groups){
     k1 %<>%
       dplyr::filter(labels != 'No. of observations') %>%
@@ -205,6 +209,8 @@ to_word <- function(
     )
 
     current_group = "None"
+
+    group.row.id <- k1 %>% select(group) %>% mutate(id = 1:nrow(.)) %>% filter(group!="None") %>% group_by(group) %>% top_n(-1, id) %>% pull(id)
 
     for(i in seq_along(k1$group)){
 
@@ -293,8 +299,22 @@ to_word <- function(
 
   if(apply_format_steps){
 
+    even <- seq_len(nrow(k1))%%2 == 0
+    odd <- !even
+
     out %<>%
       flextable::theme_box() %>%
+      flextable::border_remove() %>%
+      # Border line for header
+      flextable::hline_top(part = "header", border = fp_border(width = 3)) %>%
+      flextable::hline_bottom(part="header", border=fp_border(width = 3)) %>%
+      flextable::hline_bottom(part="body", border = fp_border(width = 3)) %>%
+      hline_header(border = fp_border( width = 1.5), bottom=F) %>%
+      # Set background colors for rows
+      flextable::bg(i = odd, bg = "#EFEFEF", part = "body") %>%
+      flextable::bg(i = even, bg = "transparent", part = "body") %>%
+      {if(!is.null(group.row.id)) flextable::bg(x=., i = group.row.id, bg = "#CFCFCF", part = "body") else .} %>%
+      flextable::hline(i=setdiff(group.row.id-1, c(0)), j = 1, part="body", border = fp_border(width = 1.5)) %>%
       flextable::align(
         j = 1,
         align = 'left',
@@ -324,6 +344,9 @@ to_word <- function(
         ref_symbols = c("*"),
         part = "header"
       ) %>%
+      flextable::merge_v(part = 'header') %>%
+      #flextable::fontsize(size=font_size, part = 'all') %>%
+      {if(!is.null(group.row.id)) flextable::bold(., i=group.row.id, j = 1, part="body") else .} %>%
       flextable::merge_v(part = 'header')
 
     ref_symbols <- c("†", "‡", "§", "||", "¶", "#", "**")
