@@ -18,6 +18,8 @@
 
 # object = tbl_one
 # use_groups=FALSE
+# font_size = 12
+# apply_format_steps = TRUE
 # include_1st_header = TRUE
 # include_2nd_header = TRUE
 # include_3rd_header = TRUE
@@ -187,7 +189,6 @@ to_word <- function(
   object$kable_data %<>%
     dplyr::filter(labels != 'No. of observations')
 
-
   if(use_groups){
     k1 %<>%
       flextable::as_grouped_data(groups = 'group') %>%
@@ -232,7 +233,6 @@ to_word <- function(
     out <- flextable::flextable(k1)
 
   }
-
 
   fct_levels <- object$table_data %>%
     select(variable, type, labels) %>%
@@ -302,7 +302,7 @@ to_word <- function(
     even <- seq_len(nrow(k1))%%2 == 0
     odd <- !even
 
-    out %>%
+    out %<>%
       flextable::theme_box() %>%
       flextable::border_remove() %>%
       # Border line for header
@@ -346,12 +346,50 @@ to_word <- function(
       ) %>%
       flextable::merge_v(part = 'header') %>%
       #flextable::fontsize(size=font_size, part = 'all') %>%
-      {if(!is.null(group.row.id)) flextable::bold(., i=group.row.id, j = 1, part="body") else .}
+      {if(!is.null(group.row.id)) flextable::bold(., i=group.row.id, j = 1, part="body") else .} %>%
+      flextable::merge_v(part = 'header')
 
-      # flextable::autofit()
+    ref_symbols <- c("†", "‡", "§", "||", "¶", "#", "**")
 
-  } else {
-    out
+    if(!is.null(object$table_note)){
+
+      notes <- object$table_data %>%
+        dplyr::select(label, note) %>%
+        unnest() %>%
+        filter(!is.na(note))
+
+      for(k in 1:nrow(notes)){
+
+        note_label = notes$label[k]
+        note_fill = notes$note[k]
+        note_indx <- which(out$body$dataset$Characteristic==note_label)
+
+
+        out %<>%
+          flextable::footnote(
+            i = note_indx,
+            j = 1,
+            value = flextable::as_paragraph(
+              flextable::as_chunk(note_fill)
+            ),
+            part = 'body',
+            ref_symbols = ref_symbols[k]
+          )
+      }
+
+    }
+
+    if(!is.null(object$table_abbr)){
+      out %<>%
+        flextable::footnote(
+          i=1, j=1, ref_symbols = "",
+          value = flextable::as_paragraph(object$table_abbr)
+        )
+    }
+
   }
+
+  out %>%
+    flextable::fontsize(size = font_size, part = 'all')
 
 }

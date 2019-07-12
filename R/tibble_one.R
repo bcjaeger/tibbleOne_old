@@ -95,8 +95,8 @@
 #' tbl_one %>%
 #'   to_word(use.groups = FALSE)
 
-# data = data
-# formula = ~ .
+# data = analysis
+# formula = ~ . | sex
 # strat = NULL
 # by = NULL
 # row.vars = NULL
@@ -193,6 +193,9 @@ tibble_one <- function(
     Overall = nrow(data)
   )
 
+  # make adjustments to table parameters
+  # based on whether or not a stratification
+  # variable was specified
   if(!is.null(strat)){
 
     strat_labs <- if(!is.null(var_label(data[[strat]]))){
@@ -267,11 +270,7 @@ tibble_one <- function(
         tbl_data,
         .f=function(.tbl_data){
           vlab <- var_label(.tbl_data)
-          if(is.null(vlab)){
-            'None'
-          } else {
-            vlab
-          }
+          if(is.null(vlab)){'None'} else {vlab}
         }
       ),
       unit = purrr::map_chr(
@@ -355,11 +354,11 @@ tibble_one <- function(
     )
 
   footnote_marker_fun <- if(footer_notation=='symbol'){
-    footnote_marker_symbol
+    kableExtra::footnote_marker_symbol
   } else if(footer_notation == 'number'){
-    footnote_marker_number
+    kableExtra::footnote_marker_number
   } else if(footer_notation == 'alphabet'){
-    footnote_marker_alphabet
+    kableExtra::footnote_marker_alphabet
   }
 
   note_fill_indx <- !is.na(meta_data$note)
@@ -376,18 +375,18 @@ tibble_one <- function(
   #
   # }
 
-  for(i in which(note_fill_indx)){
-
-    meta_data$labels[[i]][1] %<>%
-      paste0(footnote_marker_fun(note_fill_cntr))
-
-    note_fill_cntr %<>% add(1)
-
-  }
-
+  # move to to_kable
+  # for(i in which(note_fill_indx)){
+  #
+  #   meta_data$labels[[i]][1] %<>%
+  #     paste0(footnote_marker_fun(note_fill_cntr))
+  #
+  #   note_fill_cntr %<>% add(1)
+  #
+  # }
 
   table_abbrs <- meta_data$abbr %>%
-    purrr::discard(is.na) %>%
+    purrr::keep(~any(!is.na(.x))) %>%
     unlist()
 
   if(!is.null(strat)){
@@ -395,11 +394,12 @@ tibble_one <- function(
   }
 
   table_abbrs %<>%
+    map2_chr(names(.), ~paste(.y, .x, sep = ' = ')) %>%
     sort() %>%
     paste(collapse = ', ')
 
   table_notes <- meta_data$note %>%
-    purrr::discard(is.na) %>%
+    purrr::keep(~any(!is.na(.x))) %>%
     unlist()
 
   if(!is.null(strat)){
