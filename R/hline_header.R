@@ -6,7 +6,7 @@
 #'
 #' @export
 #'
-#' @examples
+
 hline_header <- function(x, border = NULL, bottom=F) {
   n.row <- x$header$spans$rows %>% nrow()
   n.col <- x$header$spans$rows %>% ncol()
@@ -14,9 +14,14 @@ hline_header <- function(x, border = NULL, bottom=F) {
   out <- x
   for(i in 1:n.row){
     for(j in 1:n.col){
-      if(out$header$spans$rows[i, j]!=0 &
-         out$header$dataset[i, j]!= " ")
-          out <- flextable::hline(out, i=i, j = j:(j+out$header$spans$rows[i, j]-1), part="header", border=border)
+      if(out$header$spans$rows[i, j]!=0 & out$header$dataset[i, j]!= " ")
+          out <- flextable::hline(
+            x = out,
+            i = i,
+            j = j:(j+out$header$spans$rows[i, j]-1),
+            part="header",
+            border = border
+          )
     }
   }
   out

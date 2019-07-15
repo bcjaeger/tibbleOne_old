@@ -1,4 +1,4 @@
-Package: KableOne
+Package: tibbleOne
 Type: Package
 Title: Table One for Latex and Html R Markdown Documents
 Version: 0.1.0
@@ -20,6 +20,7 @@ Imports:
     tidyr,
     rlang,
     labelled,
+    officer,
     forcats,
     purrr,
     magrittr,

@@ -13,21 +13,22 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 ```
-# KableOne
 
-The goal of KableOne is to make it easy for analysts to include a Table 1 object in both LaTeX and html markdown documents. I made this package because I was unable to get the html tables I wanted from the existing table one R packages. Notably, this package has far fewer features than the outstanding TableOne package, but it can get a readable Table 1 object into a markdown document with less effort.
+# tibbleOne
+
+The goal of tibbleOne is to make it easy for analysts to include a Table 1 object in both LaTeX and html markdown documents. I made this package because I was unable to get the html tables I wanted from the existing table one R packages. Notably, this package has far fewer features than the outstanding TableOne package, but it can get a readable Table 1 object into a markdown document with less effort.
 
 ## Installation
 
-You can install the latest version of KableOne from github with:
+You can install the latest version of tibbleOne from github with:
 
 ``` r
-devtools::install_github('bcjaeger/KableOne')
+devtools::install_github('bcjaeger/tibbleOne')
 ```
 
 ## Example
 
-This example shows the basic elements of KableOne. First, we apply some aesthetic changes to the data:
+This example shows the basic elements of tibbleOne. First, we apply some aesthetic changes to the data:
 
 ```{r example}
 
@@ -36,7 +37,7 @@ library(tidyverse)
 library(magrittr)
 library(survival)
 library(kableExtra)
-library(KableOne)
+library(tibbleOne)
 
 data = pbc %>%
   dplyr::select(
@@ -100,7 +101,6 @@ Now we can apply the `tibble_one` function to get an object that we can pass alo
 tbl_one = data %>%
   tibble_one(
     formula = ~ . | trt,
-    include.allcats = FALSE,
     include.freq = FALSE,
     include.pval = TRUE
   )
@@ -113,7 +113,8 @@ Last step, we pass `tbl_one` into the `to_kable()` function, which provides a co
 
 tbl_one %>% 
   to_kable(
-    use.groups = TRUE
+    use.groups = TRUE,
+    indent.groups = FALSE
   ) %>%
   kable_styling(
     position = 'center',

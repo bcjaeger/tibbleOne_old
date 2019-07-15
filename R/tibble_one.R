@@ -1,21 +1,22 @@
 
+
 #' make a tidy data frame with table one information
 #' @param data a data frame
+#' @param meta_data a meta data frame. If unspecified, a meta data frame will be created using `data`.
 #' @param formula an optional formula object. The left hand side of the formula should be blank. The right hand side of the formula should contain row variables for the table. The '|' symbol can be used to include stratifying variables. If this option is used, no more than two stratifying variables should be used, and they must be separated by a * symbol. If formula is used, the strat, by, and row.vars inputs are ignored.
 #' @param strat a character value indicating the column name in data that will be used to stratify the table
 #' @param by a character value indicating the column name in data that will be used to split the table into groups, prior to stratification.
 #' @param row.vars a character vector indicating column names of row variables in the table. If unspecified, all columns are used.
-#' @param include.pval T/F, should the table include a column for p-values?
+#' @param include.pval T/F, should the table include a column for p-values? If p-values are included, factor variables are handled using chi-square tests, continuous variables are handled using t-tests or ANOVA, depending on the number of categories in the table stratification.
+#' @param expand_binary_catgs T/F, should all categories be included for binary categorical variables? (This only applies to binary variables.)
 #' @param include.freq T/F, should frequency values be included for categorical variables?
-#' @param include.allcats T/F, should all categories be included for categorical variables?
-#' @param footer_notation one of `number`, `alphabet`, `symbol` and `none`
 #' @param include.missinf T/F, should the table include information on percent of missing values?
 #' @export
 #' @importFrom dplyr 'group_by' 'bind_rows' 'case_when'
-#' @importFrom rlang 'enquo'
+#' @importFrom rlang '%||%'
 #' @importFrom forcats 'fct_inorder' 'fct_relevel'
 #' @importFrom labelled 'var_label'
-#' @importFrom purrr 'map_chr' 'map_int' 'pmap' 'map_dbl'
+#' @importFrom purrr 'map_chr' 'map_int' 'pmap' 'map_dbl' 'map2_chr'
 #' @importFrom tibble 'tibble'
 #' @importFrom tidyr 'spread' 'unnest' 'nest'
 #' @importFrom stats 'na.omit'
@@ -29,7 +30,7 @@
 #' library(survival)
 #' library(kableExtra)
 #' library(flextable)
-#' library(KableOne)
+#' library(tibbleOne)
 #'
 #' data = pbc %>%
 #'   dplyr::select(
@@ -96,48 +97,63 @@
 #'   to_word(use.groups = FALSE)
 
 # data = analysis
-# formula = ~ . | sex
+# meta_data = NULL
+# formula = ~ age + status + bili + edema + albumin | sex * trt
 # strat = NULL
 # by = NULL
 # row.vars = NULL
-# include.pval=TRUE
-# include.freq=FALSE
-# include.allcats=FALSE
-# footer_notation = 'symbol'
-# include.missinf=FALSE
-
+# specs_table_vals = 'median'
+# specs_table_tests = NULL
+# include.pval = TRUE
+# include.freq = FALSE
+# expand_binary_catgs = FALSE
+# include.missinf = FALSE
 
 tibble_one <- function(
   data,
+  meta_data = NULL,
   formula = NULL,
   strat = NULL,
   by = NULL,
   row.vars = NULL,
+  specs_table_vals = NULL,
+  specs_table_tests = NULL,
+  expand_binary_catgs = FALSE,
   include.pval=TRUE,
   include.freq=FALSE,
-  include.allcats=FALSE,
-  footer_notation = 'symbol',
   include.missinf=FALSE
 ){
 
   .strat = label = n_unique = name = tbl_one = tbl_val = NULL
-  . = type = value = variable = group = NULL
+  . = .data = type = value = variable = group = NULL
   value = key = abbr = unit = note = NULL
 
-  if(!is.null(formula)){
+  # Handle formula type inputs
+  if( !is.null(formula) ){
 
-    formula_rhs <-
-      paste(formula)[length(formula)] %>%
+    formula_rhs <- paste(formula) %>%
+      magrittr::extract(length(.)) %>%
       str_split_trim(pattern = '|')
 
-    strat = if(length(formula_rhs) < 2){
+    strat <- if(length(formula_rhs) < 2){
       NULL
     } else {
       str_split_trim(formula_rhs[2], pattern = "*")
     }
 
+    if(!all(strat %in% names(data))){
+      stop('stratification variable is not in data', call.=FALSE)
+    }
+
     if(length(strat) > 2){
-      stop("Too many stratifying variables", call. = FALSE)
+
+      stop(
+        "You have specified ", length(strat), " stratifying variables.",
+        "\nThe maximum number of stratifying",
+        " variables currently allowed is 2",
+        call. = FALSE
+      )
+
     }
 
     if(length(strat)==2){
@@ -156,34 +172,140 @@ tibble_one <- function(
         )
         stop(stop_msg, call. = FALSE)
       }
+
     }
 
     row.vars <-
       if(formula_rhs[1] == '.'){
-        setdiff(names(data),strat)
+        setdiff(names(data),c(strat,by))
       } else {
-        formula_rhs[1] %>%
-          str_split(pattern = fixed("+")) %>%
-          unlist() %>%
-          trimws()
+        str_split_trim(formula_rhs[1], pattern = '+')
       }
+
+    bad_row_vars <- row.vars %in% c(strat, by)
+
+    if(any(bad_row_vars)){
+
+      stop(
+        "row variables cannot also be stratification or by variables.",
+        "\nCheck the following terms in your formula: ",
+        glue::glue_collapse(
+          row.vars[bad_row_vars],
+          sep = ', ',
+          last = ', and'
+        ),
+        call. = FALSE
+      )
+
+    }
+
+    bad_row_vars <- !(row.vars %in% names(data))
+
+    if(any(bad_row_vars)){
+
+      stop(
+        "some row variables do not link to columns in your data.",
+        "\nCheck the following terms in your formula: ",
+        glue::glue_collapse(
+          row.vars[bad_row_vars],
+          sep = ', ',
+          last = ', and'
+        ),
+        call. = FALSE
+      )
+
+    }
+
   }
 
-  if(is.null(formula) & is.null(row.vars)){
+  # make it easier to read my if-then code:
+  stratified_table <- !is.null(strat)
+
+  if( is.null(formula) & is.null(row.vars) ){
     row.vars = setdiff(names(data), c(strat, by))
-    #stop("Please specify formula or row.vars, strat, and by")
+    warning(
+      "No formula specified and no row.vars specified.",
+      " All columns in the data will be used."
+    )
   }
 
-  if(is.null(strat) & !is.null(by)){
+  if( !stratified_table & !is.null(by) ){
     strat = by
     by = NULL
   }
 
-  table_value_description <- paste(
-    "Table values are mean (standard deviation) and",
-    if(include.freq) "count (percent)" else "percent",
-    "for continuous and categorical variables, respectively."
-  )
+  if( !stratified_table & include.pval ){
+    stop(
+      "You have included p-values but have not",
+      " indicated which groups to compare.",
+      "\nPlease specify strat in your formula, e.g.",
+      " 'formula = ~ . | strat', if you want p-values",
+      call. = FALSE
+    )
+  }
+
+  # meta data set is compiled if needed
+  mta_data <- meta_data %||% build_meta(data, expand_binary_catgs) %>%
+    dplyr::filter(variable %in% c(strat, by, row.vars))
+
+  # check variable types in meta data
+  if( !all(mta_data$type %in% c('factor', 'numeric', 'integer')) ) {
+
+    out_variables <- mta_data %>%
+      dplyr::filter(!type %in% c('factor', 'numeric', 'integer')) %>%
+      mutate(variable = paste0(variable, ' (',type,')')) %>%
+      purrr::pluck('variable') %>%
+      paste(collapse = ' -- ')
+
+    out_msg <- paste(
+      "tibble_one is compatible with factor, numeric, and integer variables.",
+      "Please inspect the following variables in your input data:",
+      out_variables,
+      sep= '\n'
+    )
+
+    stop(out_msg, call. = FALSE)
+
+  }
+
+  # initialize default specification for table values / tests
+  default_spec <- rep('default', length(row.vars)) %>%
+    set_names(row.vars)
+
+  # Handle table value and test specs
+  specs_table_vals <- parse_specs(default_spec, specs_table_vals)
+  specs_table_tests <- parse_specs(default_spec, specs_table_tests)
+
+  # determine what is actually in these specs
+  spec_means <- any(c('default','mean') %in% specs_table_vals)
+  spec_medns <- any('median' %in% specs_table_vals)
+
+  # determine how to describe these specs
+  table_value_description <- if ( spec_means && spec_medns ) {
+
+    paste(
+      "Table values for continuous variables are mean (standard deviation)",
+      "or median [interquartile range]. Table values for categorical",
+      "variables are", if(include.freq) "count (percent)." else "percent."
+      )
+
+  } else if (spec_means && !spec_medns) {
+
+    paste(
+      "Table values are mean (standard deviation) and",
+      if(include.freq) "count (percent)" else "percent",
+      "for continuous and categorical variables, respectively."
+    )
+
+  } else if (!spec_means && spec_medns) {
+
+    paste(
+      "Table values are median [interquartile range] and",
+      if(include.freq) "count (percent)" else "percent",
+      "for continuous and categorical variables, respectively."
+    )
+
+  }
 
   # Create sample size values
   n_obs <- c(
@@ -195,262 +317,126 @@ tibble_one <- function(
 
   # make adjustments to table parameters
   # based on whether or not a stratification
-  # variable was specified
-  if(!is.null(strat)){
+  # variable was specified. Initialize empty
+  # container for stratification data
 
-    strat_labs <- if(!is.null(var_label(data[[strat]]))){
-      var_label(data[[strat]])
-    } else {
-      strat
-    }
+  strat_data <- NULL
+  select_vec <- row.vars
 
-    n_by <- 1
+  if(stratified_table){
+
+    # if strat is specified, we know there is at least
+    # one level of stratification. Therefore, we
+    # identify the label of the stratification variable
+    strat_labs <- get_label(data, strat)
+
+    # We also specify that there is one by group and
+    # and initialize by_table, which we will modify if there
+    # is a second stratifying variable (i.e., by != NULL)
+    n_by <- 1L
     by_table <- NULL
 
     if(!is.null(by)){
 
-      strat_labs %<>% c(
-        if(!is.null(var_label(data[[by]]))){
-          var_label(data[[by]])
-        } else {
-          by
-        }
-      )
-
+      # For this type of table, two headers are needed.
+      # To set this up, we modify the strat variable in data and
+      # designate the number of participants in each by category
+      strat_labs %<>% c(get_label(data, by))
       by_table <- table(data[[by]])
       n_by <- length(by_table)
-
       data[[strat]] %<>% interaction(data[[by]], sep='_._')
 
     }
 
+    # count the number of participants in each strata
     strat_table <- table(data[[strat]])
 
+    # add the counts of participants in each strata to the n_obs vector
     n_obs %<>% c(strat_table)
 
+    # formalize information about strata with a list
     strat_data = list(
+      # total no. of groups
       n_groups = length(strat_table) / n_by,
+      # total no. of by groups
       n_by = n_by,
+      # counts in the by groups
       by_table = by_table,
+      # label vector
       label = strat_labs
     )
 
-    tbl_data = data %>% dplyr::rename(
-      .strat = !!strat
-    ) %>%
-      dplyr::select(.strat, !!enquo(row.vars))
+    # Create a data frame with edited strat col
+    # rename the strat col so that downstream
+    # code can be consistent for multiple table types
 
-  } else {
-
-    strat_data = NULL
-    include.pval = FALSE
-
-    tbl_data = data %>%
-      dplyr::select(!!enquo(row.vars))
+    rename_vec <- set_names(strat, ".strat")
+    select_vec <- c(rename_vec, row.vars)
 
   }
 
-  if(include.pval){
-    n_obs %<>% c("P-value" = '')
-  }
+  # modify n_obs vector to include p-value label if needed
+  if( include.pval ){ n_obs %<>% c("P-value" = '') }
 
+  # the top row of the table is initialized here (descr = descriptive)
   descr_row <- vibble(n_obs)
 
-  meta_data <-
-    tibble::tibble(
-      variable = names(tbl_data),
-      type = map_chr(
-        tbl_data, class
-      ),
-      n_unique = map_int(
-        tbl_data,
-        ~length(unique(na.omit(.x)))
-      ),
-      label = purrr::map_chr(
-        tbl_data,
-        .f=function(.tbl_data){
-          vlab <- var_label(.tbl_data)
-          if(is.null(vlab)){'None'} else {vlab}
-        }
-      ),
-      unit = purrr::map_chr(
-        variable,
-        ~ {
-          if(!is.null(attr(tbl_data[[.x]],'units'))){
-            attr(tbl_data[[.x]],'units')
-          } else {
-            NA_character_
-          }
-        }
-      ),
-      abbr = purrr::map(
-        variable,
-        ~ {
-          if(!is.null(attr(tbl_data[[.x]],'abbrs'))){
-            attr(tbl_data[[.x]],'abbrs')
-          } else {
-            NA_character_
-          }
-        }
-      ),
-      note = purrr::map(
-        variable,
-        ~ {
-          if(!is.null(attr(tbl_data[[.x]],'notes'))){
-            attr(tbl_data[[.x]],'notes')
-          } else {
-            NA_character_
-          }
-        }
-      ),
-      labels = purrr::pmap(
-        list(
-          variable,
-          tbl_data,
-          type,
-          label,
-          n_unique,
-          note
-        ),
-        .f = function(
-          .variable,
-          .tbl_data,
-          .type,
-          .label,
-          .n_unique,
-          .note
-        ){
-          .lab = if(.label=='None') capitalize(.variable) else .label
+  # the original data is modified for computing table values
+  # .strat is the stratifying variable
+  tbl_data = dplyr::select(data, !!!select_vec)
 
-          if(.type=='factor'){
-            if(include.allcats | .n_unique > 2){
-              c(.lab, levels(.tbl_data))
-            } else if(.n_unique==2){
-              if(levels(.tbl_data)[2]=='Yes'|levels(.tbl_data)[2]=='Y'){
-                .lab
-              } else {
-                levels(.tbl_data)[2]
-              }
-            }
-          } else {
-            .lab
-          }
-        }
-      ),
-      group = purrr::map_chr(tbl_data, var_group)
-    ) %>%
-    dplyr::filter(
-      variable != '.strat'
-    ) %>%
-    dplyr::select(
-      variable,
-      label,
-      abbr,
-      unit,
-      type,
-      labels,
-      group,
-      note
-    )
-
-  footnote_marker_fun <- if(footer_notation=='symbol'){
-    kableExtra::footnote_marker_symbol
-  } else if(footer_notation == 'number'){
-    kableExtra::footnote_marker_number
-  } else if(footer_notation == 'alphabet'){
-    kableExtra::footnote_marker_alphabet
-  }
-
-  note_fill_indx <- !is.na(meta_data$note)
-  note_fill_cntr <- 2
-
-  # Add footnote for column spanning variable
-  # This would be nice but throws an error in doc_parse_raw
-  # if(!is.null(attr(data[[strat]], 'notes'))){
-  #
-  #   strat_data$label %<>%
-  #     paste0(footnote_marker_fun(note_fill_cntr))
-  #
-  #   note_fill_cntr %<>% add(1)
-  #
-  # }
-
-  # move to to_kable
-  # for(i in which(note_fill_indx)){
-  #
-  #   meta_data$labels[[i]][1] %<>%
-  #     paste0(footnote_marker_fun(note_fill_cntr))
-  #
-  #   note_fill_cntr %<>% add(1)
-  #
-  # }
-
-  table_abbrs <- meta_data$abbr %>%
+  # abbreviations are organized into one string
+  table_abbrs <- mta_data$abbr %>%
     purrr::keep(~any(!is.na(.x))) %>%
-    unlist()
-
-  if(!is.null(strat)){
-    table_abbrs %<>% c(attr(data[[strat]],'abbr'))
-  }
-
-  table_abbrs %<>%
-    map2_chr(names(.), ~paste(.y, .x, sep = ' = ')) %>%
+    purrr::flatten() %>%
+    purrr::map2_chr(names(.), ~ paste(.y, .x, sep = ' = ')) %>%
     sort() %>%
     paste(collapse = ', ')
 
-  table_notes <- meta_data$note %>%
-    purrr::keep(~any(!is.na(.x))) %>%
-    unlist()
+  # notes are left as a named list
+  table_notes <- mta_data$note %>%
+    set_names(mta_data$variable) %>%
+    purrr::keep(~any(!is.na(.x)))
 
-  if(!is.null(strat)){
-    table_notes %<>% c(attr(data[[strat]],'note'), .)
-  }
-
-  if(any(meta_data$type == 'character')){
-
-    out_variables <- meta_data %>%
-      dplyr::filter(type=='character') %>%
-      purrr::pluck('variable') %>%
-      paste(collapse = ' -- ')
-
-    out_msg <- paste(
-      "tibble_one expects character variables to be factors.",
-      "Please inspect the following variables in the input data:",
-      out_variables,
-      sep= '\n'
-    )
-    stop(out_msg, call. = FALSE)
-  }
-
-  if(any(map_dbl(meta_data$labels, length)>=8)){
-
-    out_variables <- map_dbl(meta_data$labels, length) %>%
-      set_names(meta_data$variable) %>%
-      .[.>=8] %>%
-      names()
-
-    out_msg <- paste(
-      "\n Some row variables have a large number (>=8) of categories:",
-      out_variables,
-      sep = '\n'
-    )
-
-    warning(out_msg)
-
-  }
-
-  kable_data <- meta_data %>%
+  table_data <- mta_data %>%
+    select(-c(abbr,note)) %>%
+    {
+      if(stratified_table){
+        filter(., !variable %in% c(strat, by))
+      } else {
+        .
+      }
+    } %>%
+    left_join(
+      enframe(
+        specs_table_vals,
+        name = 'variable',
+        value = 'fun_descr'
+      ),
+      by = 'variable'
+    ) %>%
+    left_join(
+      enframe(
+        specs_table_tests,
+        name = 'variable',
+        value = 'test_descr'
+      ),
+      by = 'variable'
+    ) %>%
     mutate(
       tbl_val = pmap(
-        list(variable,type,label,group),
-        .f=function(.variable, .type, .label, .group){
+        .l = list(variable, type, fun_descr, test_descr),
+        .f = function(.variable, .var_type, .fun_type, .test_type){
           gen_tbl_value(
-            variable        = .variable,
-            type            = .type,
-            data            = tbl_data,
-            include.pval    = include.pval,
-            include.freq    = include.freq,
-            include.allcats = include.allcats
+            data = tbl_data,
+            variable = .variable,
+            var_type = .var_type,
+            fun_type = .fun_type,
+            test_type = .test_type,
+            include.pval = include.pval,
+            include.freq = include.freq,
+            stratified_table = stratified_table,
+            expand_binary_catgs = expand_binary_catgs
           )
         }
       )
@@ -459,10 +445,7 @@ tibble_one <- function(
       variable, unit, labels, tbl_val, group
     ) %>%
     tidyr::unnest() %>%
-    dplyr::bind_rows(
-      descr_row,
-      .
-    ) %>%
+    dplyr::bind_rows(descr_row, .) %>%
     mutate(
       variable = factor(variable, levels = c('descr', row.vars)),
       group = factor(group),
@@ -475,23 +458,37 @@ tibble_one <- function(
     dplyr::arrange(group, variable) %>%
     dplyr::select(-unit)
 
-  structure(
-    list(
-      table_data = meta_data,
-      table_abbr = table_abbrs,
-      table_note = table_notes,
-      table_foot_notation = footer_notation,
-      table_desc = table_value_description,
-      table_opts = list(
-        by       = by,
-        allcats  = include.allcats,
-        missinf  = include.missinf,
-        pval     = include.pval
-      ),
-      kable_data = kable_data,
-      strat_data = strat_data
-    ),
-    class = 'tibble_one'
+  # Set table attributes
+
+  # what type of table is this?
+  # If there is no stratification at all: single_header
+  # If there is one stratification variable: double_header
+  # If there is a stratification and a by variable: triple_header
+
+  table_num <- 1 + as.numeric(!is.null(strat)) + as.numeric(!is.null(by))
+
+  table_type <- switch(
+    EXPR = as.character(table_num),
+    "1" = 'single_decker',
+    "2" = 'double_decker',
+    "3" = 'triple_decker',
+    "unkown table type"
   )
+
+  # These are read in and used in the to_yyy functions
+  attr(table_data, 'type')  <- table_type
+  attr(table_data, 'strat') <- strat_data
+  attr(table_data, 'byvar') <- by
+  attr(table_data, 'pvals') <- include.pval
+  attr(table_data, 'abbrs') <- table_abbrs
+  attr(table_data, 'notes') <- table_notes
+  attr(table_data, 'descr') <- table_value_description
+  attr(table_data, 'allcats') <- expand_binary_catgs
+  attr(table_data, 'missinf') <- include.missinf
+
+  # set class to include tibble_one
+  class(table_data) %<>% c('tibble_one')
+
+  table_data
 
 }

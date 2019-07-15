@@ -11,14 +11,12 @@ knitr::opts_chunk$set(echo = F, message = F, warning = F)
 
 ```{r example}
 
-#devtools::install_github('boyiguo1/KableOne')
-
 library(labelled)
 library(tidyverse)
 library(magrittr)
 library(survival)
 library(kableExtra)
-library(KableOne)
+library(tibbleOne)
 library(flextable)
 library(officer)
 

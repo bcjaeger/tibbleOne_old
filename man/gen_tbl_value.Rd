@@ -4,21 +4,21 @@
 \alias{gen_tbl_value}
 \title{generate table one values for a column variable}
 \usage{
-gen_tbl_value(variable, type, data, include.pval, include.freq,
-  include.allcats)
+gen_tbl_value(data, variable, var_type, fun_type, test_type,
+  stratified_table, include.pval, include.freq, expand_binary_catgs)
 }
 \arguments{
-\item{variable}{character value, column name of the variable}
-
-\item{type}{character value, should be numeric, integer, or factor}
-
 \item{data}{a data frame}
 
-\item{include.pval}{T/F, should the table include a column for p-values?}
+\item{variable}{character value, column name of the variable}
+
+\item{include.pval}{T/F, should the table include a column for p-values? If p-values are included, factor variables are handled using chi-square tests, continuous variables are handled using t-tests or ANOVA, depending on the number of categories in the table stratification.}
 
 \item{include.freq}{T/F, should frequency values be included for categorical variables?}
 
-\item{include.allcats}{T/F, should all categories be included for categorical variables?}
+\item{expand_binary_catgs}{T/F, should all categories be included for binary categorical variables? (This only applies to binary variables.)}
+
+\item{type}{character value, should be numeric, integer, or factor}
 }
 \description{
 generate table one values for a column variable

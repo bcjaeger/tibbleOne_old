@@ -4,6 +4,8 @@
 #' @param ... arguments passed to kable function
 #' @param format character, format for printing
 #' @param use.groups T/F, should rows be grouped?
+#' @param indent.groups T/F, should entries within groups be indented? (this has no effect if `use.groups` is `FALSE`)
+#' @param footnote_notation character value indicating footnote symbols to use in tables. Eligible values are `symbol`, `number`, and `alphabet`.
 #' @param include_1st_header T/F, should bottom header be included?
 #' @param include_2nd_header T/F, should middle header be included?
 #' @param include_3rd_header T/F, should top header be included?
@@ -16,6 +18,7 @@
 # object = tbl_one
 # format=NULL
 # use.groups=TRUE
+# footnote_notation = 'symbol'
 # include_1st_header = TRUE
 # include_2nd_header = TRUE
 # include_3rd_header = TRUE
@@ -24,6 +27,8 @@ to_kable <- function(
   object,
   format=NULL,
   use.groups=TRUE,
+  indent.groups = TRUE,
+  footnote_notation = 'symbol',
   include_1st_header = TRUE,
   include_2nd_header = TRUE,
   include_3rd_header = TRUE,
@@ -31,127 +36,81 @@ to_kable <- function(
 ){
 
   # for CRAN
-
   variable = . = group = value = key = NULL
 
-  if(is.null(format)) format = getOption("knitr.table.format")
+  by <- attr(object, 'byvar')
+  strat_data <- attr(object, 'strat')
+  table_type <- attr(object, 'type')
+  table_abbrs <- attr(object, 'abbrs')
+  table_notes <- attr(object, 'notes')
+  include.pval <- attr(object, 'pvals')
+  include.missinf <- attr(object, 'missinf')
+  expand_binary_catgs <- attr(object, 'allcats')
+  table_value_description <- attr(object, 'descr')
 
-  pvals_in_table <- isTRUE(object$table_opts$pval)
-  using_all_cats <- isTRUE(object$table_opts$allcats)
-  footer_notation <- object$table_foot_notation
+  if (is.null(format))
+    format = getOption("knitr.table.format")
 
-  if(all(object$table_data$group=='None')) use.groups = FALSE
-
-  if(isFALSE(use.groups)){
-    object$kable_data %<>% dplyr::arrange(variable)
+  if (all(object$group == 'None')) {
+    use.groups = FALSE
   }
 
-  if(pvals_in_table & format == 'latex'){
+  if(!use.groups){
+    object %<>% dplyr::arrange(variable)
+  }
+
+  if (include.pval & format == 'latex') {
 
     object$kable_data[['P-value']] %<>%
       paste("$",.,'$') %>%
       gsub(
         pattern = '<',
         replacement = '{<}',
-        x = .
+        x = .,
+        fixed = TRUE
       ) %>%
       gsub(
         pattern = '>',
         replacement = '{>}',
-        x = .
+        x = .,
+        fixed = TRUE
       )
 
   }
 
-  if(!is.null(object$strat_data)){
+  k1_decor <- parse_kable_headers(
+    table_type = table_type,
+    strat_data = strat_data,
+    include.pval = include.pval,
+    format = format
+  )
 
-    if(!is.null(object$table_opts$by)){
+  k1 <- dplyr::mutate_if(object, is.factor, as.character)
 
-      header <- if(pvals_in_table){
-        c(2,
-          rep(object$strat_data$n_groups, object$strat_data$n_by),
-          1
-        ) %>%
-          set_names(
-            c(" ",
-              rep(object$strat_data$label[1], object$strat_data$n_by),
-              " ")
-          )
-      } else {
-        c(2, rep(object$strat_data$n_groups, object$strat_data$n_by)) %>%
-          set_names(
-            c(" ", rep(object$strat_data$label[1], object$strat_data$n_by))
-          )
-      }
+  footnote_marker_fun <- switch(
+    EXPR = footnote_notation,
+    'symbol' = kableExtra::footnote_marker_symbol,
+    'number' = kableExtra::footnote_marker_number,
+    'alphabet' = kableExtra::footnote_marker_alphabet
+  )
 
-      midder_labs <- if(format=='html'){
-        paste0(
-          names(object$strat_data$by_table),
-          "<br/>","(N = ",
-          object$strat_data$by_table,')'
-        )
-      } else {
-        names(object$strat_data$by_table)
-      }
+  # place footnote symbols in table rows
+  # one symbol is places for each table note
+  # initialize a counter to advance symbols
 
+  for(i in seq_along(table_notes) ){
 
-      midder_length <- rep(
-        object$strat_data$n_groups,
-        object$strat_data$n_by,
-      )
+    indx <- names(table_notes)[i] %>%
+      grep(x = k1$variable, fixed = TRUE)
 
-      midder <- if(pvals_in_table){
-        c(2, midder_length, 1) %>%
-        set_names(c(" ", midder_labs, " "))
-      } else {
-        c(2, midder_length) %>%
-          set_names(c(" ", midder_labs))
-      }
-
-      topper <- if(pvals_in_table){
-        c(2, sum(midder_length), 1) %>%
-          set_names(c(" ", object$strat_data$label[2], " "))
-      } else {
-        c(2, sum(midder_length)) %>%
-          set_names(c(" ", object$strat_data$label[2]))
-      }
-
-    } else {
-
-      header <- if(pvals_in_table){
-        c(2, object$strat_data$n_groups, 1) %>%
-          set_names(
-            c(" ", object$strat_data$label, " ")
-          )
-      } else {
-        c(2, object$strat_data$n_groups) %>%
-          set_names(
-            c(" ", object$strat_data$label)
-          )
-      }
-
-    }
-
-
+    k1$labels[min(indx)] %<>%
+      paste0(footnote_marker_fun(i+1))
 
   }
 
-  k1 <- object$kable_data %>%
-    dplyr::mutate_if(is.factor, as.character)
-
-  if(!using_all_cats){
-
-    k1 %<>%
-      dplyr::mutate(
-        labels = case_when(
-          labels %in% c('Y','Yes') ~ capitalize(variable),
-          TRUE ~ labels
-        )
-      )
-
-  }
-
-  repair_index <- grepl(pattern = "_._", x = names(k1))
+  # Name repair is performed for double decker tables
+  # (names have _._ symbol to indicate strat_._by levels)
+  repair_index <- grepl(pattern = "_._", x = names(k1), fixed = TRUE)
   names_need_repairing <- any(repair_index)
 
   if(names_need_repairing){
@@ -168,6 +127,7 @@ to_kable <- function(
 
   # format column names to have n=yy on the bottom
   # this only works for html tables
+
   if(format == 'html'){
 
     n_obs <- k1 %>%
@@ -196,12 +156,10 @@ to_kable <- function(
 
     k1 %<>%
       dplyr::filter(labels != 'No. of observations') %>%
-      dplyr::select(
-        ` ` = labels, !!n_obs
-      )
+      dplyr::select(` ` = labels, !!n_obs)
 
     # need to filter original data for consistency
-    object$kable_data %<>%
+    object %<>%
       dplyr::filter(labels != 'No. of observations')
 
   } else if(format == 'latex'){
@@ -216,7 +174,7 @@ to_kable <- function(
       )
 
     if(names_need_repairing){
-      k1 %<>% dplyr::rename(!!names_to_repair)
+      k1 %<>% dplyr::rename(!!!names_to_repair)
     }
 
   }
@@ -226,68 +184,67 @@ to_kable <- function(
       align = c("l",rep("c",ncol(.)-1)), escape = FALSE#, ...
     ) %>%
     kableExtra::add_indent(
-      positions = find_indent_rows(object$kable_data$variable)
+      positions = find_indent_rows(object$variable)
     ) %>%
     kableExtra::add_footnote(
-      label = c(object$table_desc, object$table_note),
+      label = c(table_value_description, table_notes),
       threeparttable = TRUE,
       escape = FALSE,
-      notation = footer_notation
+      notation = footnote_notation
     ) %>%
     kableExtra::add_footnote(
-      label = object$table_abbr,
+      label = table_abbrs,
       escape = FALSE,
       notation = 'none'
     )
 
   if(use.groups){
 
-    grp_tbl = table(object$kable_data$group)
-    names(grp_tbl)[1] <- " "
+    grp_tbl = table(object$group)
+
+    names(grp_tbl) %<>%
+      gsub(
+        pattern = "None",
+        replacement = " ",
+        x = .
+      )
 
     k1 %<>%
       kableExtra::group_rows(
         index = grp_tbl,
         latex_gap_space = "0.5em",
         hline_after = TRUE,
-        extra_latex_after = "\\\\[-0.5em]"
+        extra_latex_after = "\\\\[-0.5em]",
+        indent = indent.groups
       )
 
   }
 
-  if(!is.null(object$strat_data)){
+  if(include_1st_header){
+    k1 %<>%
+      kableExtra::add_header_above(
+        header = k1_decor$header,
+        bold = TRUE,
+        escape = FALSE
+      )
+  }
 
-    if(include_1st_header){
-      k1 %<>%
-        kableExtra::add_header_above(
-          header = header,
-          bold = TRUE,
-          escape = FALSE
-        )
-    }
+  if(include_2nd_header){
+    k1 %<>%
+      kableExtra::add_header_above(
+        header = k1_decor$midder,
+        bold = TRUE,
+        escape = FALSE
+      )
+  }
 
-    if(!is.null(object$table_opts$by)){
-
-      if(include_2nd_header){
-        k1 %<>%
-          kableExtra::add_header_above(
-            header = midder,
-            bold = TRUE,
-            escape = FALSE
-          )
-      }
-
-      if(include_3rd_header){
-        k1 %<>%
-          kableExtra::add_header_above(
-            header = topper,
-            bold = TRUE,
-            escape = FALSE
-          )
-      }
-
-    }
-
+  if(include_3rd_header){
+    k1 %<>%
+      kableExtra::add_header_above(
+        header = k1_decor$topper,
+        bold = TRUE,
+        escape = FALSE
+      )
   }
 
   k1

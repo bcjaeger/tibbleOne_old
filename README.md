@@ -1,9 +1,9 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# KableOne
+# tibbleOne
 
-The goal of KableOne is to make it easy for analysts to include a Table
+The goal of tibbleOne is to make it easy for analysts to include a Table
 1 object in both LaTeX and html markdown documents. I made this package
 because I was unable to get the html tables I wanted from the existing
 table one R packages. Notably, this package has far fewer features than
@@ -12,27 +12,29 @@ object into a markdown document with less effort.
 
 ## Installation
 
-You can install the latest version of KableOne from github with:
+You can install the latest version of tibbleOne from github with:
 
 ``` r
-devtools::install_github('bcjaeger/KableOne')
+devtools::install_github('bcjaeger/tibbleOne')
 ```
 
 ## Example
 
-This example shows the basic elements of KableOne. First, we apply some
+This example shows the basic elements of tibbleOne. First, we apply some
 aesthetic changes to the data:
 
 ``` r
 
 library(labelled)
 library(tidyverse)
-#> -- Attaching packages ---------------------------------------------- tidyverse 1.2.1 --
-#> v tibble  2.1.2     v purrr   0.3.2
-#> v tidyr   0.8.3     v dplyr   0.8.1
+#> -- Attaching packages ------------------------------------------------------------------ tidyverse 1.2.1 --
+#> v tibble  2.1.3     v purrr   0.3.2
+#> v tidyr   0.8.3     v dplyr   0.8.3
 #> v readr   1.3.1     v stringr 1.4.0
-#> v tibble  2.1.2     v forcats 0.4.0
-#> -- Conflicts ------------------------------------------------- tidyverse_conflicts() --
+#> v tibble  2.1.3     v forcats 0.4.0
+#> Warning: package 'tidyr' was built under R version 3.6.1
+#> Warning: package 'dplyr' was built under R version 3.6.1
+#> -- Conflicts --------------------------------------------------------------------- tidyverse_conflicts() --
 #> x dplyr::filter() masks stats::filter()
 #> x dplyr::lag()    masks stats::lag()
 library(magrittr)
@@ -51,7 +53,7 @@ library(kableExtra)
 #> The following object is masked from 'package:dplyr':
 #> 
 #>     group_rows
-library(KableOne)
+library(tibbleOne)
 
 data = pbc %>%
   dplyr::select(
@@ -116,7 +118,6 @@ pass along to an Rmarkdown document.
 tbl_one = data %>%
   tibble_one(
     formula = ~ . | trt,
-    include.allcats = FALSE,
     include.freq = FALSE,
     include.pval = TRUE
   )
@@ -130,7 +131,8 @@ like the type of Table 1 that you may see in a published article.
 
 tbl_one %>% 
   to_kable(
-    use.groups = TRUE
+    use.groups = TRUE,
+    indent.groups = FALSE
   ) %>%
   kable_styling(
     position = 'center',
@@ -280,7 +282,7 @@ Female
 
 <tr>
 
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+<td style="text-align:left;">
 
 Stage
 
@@ -308,7 +310,7 @@ Stage
 
 <tr>
 
-<td style="text-align:left; padding-left: 4em;" indentlevel="2">
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
 
 One
 
@@ -340,7 +342,7 @@ One
 
 <tr>
 
-<td style="text-align:left; padding-left: 4em;" indentlevel="2">
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
 
 Two
 
@@ -372,7 +374,7 @@ Two
 
 <tr>
 
-<td style="text-align:left; padding-left: 4em;" indentlevel="2">
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
 
 Three
 
@@ -404,7 +406,7 @@ Three
 
 <tr>
 
-<td style="text-align:left; padding-left: 4em;" indentlevel="2">
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
 
 Four
 
@@ -436,7 +438,7 @@ Four
 
 <tr>
 
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+<td style="text-align:left;">
 
 Ascites
 
@@ -470,7 +472,7 @@ Ascites
 
 <tr>
 
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+<td style="text-align:left;">
 
 Bilirubin levels, mg/dl
 
@@ -504,7 +506,7 @@ Bilirubin levels, mg/dl
 
 <tr>
 
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+<td style="text-align:left;">
 
 Is there Edema?
 
@@ -532,7 +534,7 @@ Is there Edema?
 
 <tr>
 
-<td style="text-align:left; padding-left: 4em;" indentlevel="2">
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
 
 None
 
@@ -564,7 +566,7 @@ None
 
 <tr>
 
-<td style="text-align:left; padding-left: 4em;" indentlevel="2">
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
 
 A little
 
@@ -596,7 +598,7 @@ A little
 
 <tr>
 
-<td style="text-align:left; padding-left: 4em;" indentlevel="2">
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
 
 Lots
 
@@ -628,7 +630,7 @@ Lots
 
 <tr>
 
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+<td style="text-align:left;">
 
 Albumin
 
@@ -672,7 +674,7 @@ Albumin
 
 <tr>
 
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+<td style="text-align:left;">
 
 Status at last contact
 
@@ -700,7 +702,7 @@ Status at last contact
 
 <tr>
 
-<td style="text-align:left; padding-left: 4em;" indentlevel="2">
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
 
 Censored
 
@@ -732,7 +734,7 @@ Censored
 
 <tr>
 
-<td style="text-align:left; padding-left: 4em;" indentlevel="2">
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
 
 Transplant
 
@@ -764,7 +766,7 @@ Transplant
 
 <tr>
 
-<td style="text-align:left; padding-left: 4em;" indentlevel="2">
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
 
 Dead
 

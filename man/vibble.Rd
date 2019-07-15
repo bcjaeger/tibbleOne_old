@@ -2,7 +2,7 @@
 % Please edit documentation in R/vibble.R
 \name{vibble}
 \alias{vibble}
-\title{turn a named vector into a wide tibble}
+\title{turn a named vector into a wide tibble. This is similar to and connected with `tibble::enframe`. However, the `vibble` function will make a wider versus a longer tibble.}
 \usage{
 vibble(vector)
 }
@@ -10,5 +10,5 @@ vibble(vector)
 \item{vector}{a named vector}
 }
 \description{
-turn a named vector into a wide tibble
+turn a named vector into a wide tibble. This is similar to and connected with `tibble::enframe`. However, the `vibble` function will make a wider versus a longer tibble.
 }

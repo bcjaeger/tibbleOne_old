@@ -5,6 +5,7 @@
 \title{pass a tibble_one object into kable}
 \usage{
 to_kable(object, format = NULL, use.groups = TRUE,
+  indent.groups = TRUE, footnote_notation = "symbol",
   include_1st_header = TRUE, include_2nd_header = TRUE,
   include_3rd_header = TRUE, ...)
 }
@@ -14,6 +15,10 @@ to_kable(object, format = NULL, use.groups = TRUE,
 \item{format}{character, format for printing}
 
 \item{use.groups}{T/F, should rows be grouped?}
+
+\item{indent.groups}{T/F, should entries within groups be indented? (this has no effect if `use.groups` is `FALSE`)}
+
+\item{footnote_notation}{character value indicating footnote symbols to use in tables. Eligible values are `symbol`, `number`, and `alphabet`.}
 
 \item{include_1st_header}{T/F, should bottom header be included?}
 

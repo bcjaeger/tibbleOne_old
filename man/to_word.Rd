@@ -4,18 +4,21 @@
 \alias{to_word}
 \title{pass a tibble_one object into flextable}
 \usage{
-to_word(object, use_groups = TRUE, font_size = 12,
-  apply_format_steps = TRUE, include_1st_header = TRUE,
-  include_2nd_header = TRUE, include_3rd_header = TRUE, ...)
+to_word(object, font_size = 12, use_groups = TRUE,
+  indent_groups = TRUE, footnote_notation = "symbol",
+  include_1st_header = TRUE, include_2nd_header = TRUE,
+  include_3rd_header = TRUE, ...)
 }
 \arguments{
 \item{object}{a tibble_one object}
 
-\item{use_groups}{T/F, should rows be grouped?}
-
 \item{font_size}{the size of font in the table.}
 
-\item{apply_format_steps}{T/F, whether formatting steps should be applied to make the table look nice.}
+\item{use_groups}{T/F, should rows be grouped?}
+
+\item{indent_groups}{T/F, should entries within groups be indented? (this has no effect if `use_groups` is `FALSE`)}
+
+\item{footnote_notation}{character value indicating footnote symbols to use in tables. Eligible values are `symbol`, `number`, and `alphabet`.}
 
 \item{include_1st_header}{T/F, should bottom header be included?}
 
