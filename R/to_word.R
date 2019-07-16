@@ -26,6 +26,7 @@
 # include_1st_header = TRUE
 # include_2nd_header = TRUE
 # include_3rd_header = TRUE
+# withhold_footers = FALSE
 
 to_word <- function(
   object,
@@ -40,7 +41,7 @@ to_word <- function(
 ){
 
   # for CRAN
-  variable = . = group = value = key = NULL
+  group.row.id = variable = . = group = value = key = NULL
 
   by <- attr(object, 'byvar')
   strat_data <- attr(object, 'strat')
@@ -52,7 +53,7 @@ to_word <- function(
   expand_binary_catgs <- attr(object, 'allcats')
   table_value_description <- attr(object, 'descr')
 
-  if (all(object$group == 'None')) {
+  if (all(object[['group']] == 'None')) {
     use_groups = FALSE
   }
 
@@ -79,32 +80,32 @@ to_word <- function(
     ) %>%
     sum()
 
-  ft1 <- dplyr::mutate_if(object, is.factor, as.character)
+  ft1_data <- dplyr::mutate_if(object, is.factor, as.character)
 
   footnote_markers <- parse_flex_footers(footnote_notation)
 
-  # place footnote symbols in table rows
-  # one symbol is places for each table note
-  # initialize a counter to advance symbols
+  footnote_labels <- vector(
+    mode = 'character',
+    length = length(table_notes)
+  )
 
-  for(i in seq_along(table_notes) ){
+  for(i in seq_along(footnote_labels) ){
 
     indx <- names(table_notes)[i] %>%
-      grep(x = ft1$variable, fixed = TRUE)
+      grep(x = ft1_data$variable, fixed = TRUE)
 
-    ft1$labels[min(indx)] %<>%
-      paste0(footnote_markers[i+1])
+    footnote_labels[i] <- ft1_data[['labels']][min(indx)]
 
   }
 
   # Name repair is performed for double decker tables
   # (names have _._ symbol to indicate strat_._by levels)
-  repair_index <- grepl(pattern = "_._", x = names(ft1), fixed = TRUE)
+  repair_index <- grepl(pattern = "_._", x = names(ft1_data), fixed = TRUE)
   names_need_repairing <- any(repair_index)
 
   if(names_need_repairing){
 
-    names_to_repair <- names(ft1)[repair_index]
+    names_to_repair <- names(ft1_data)[repair_index]
 
     repaired_names <- names_to_repair %>%
       strsplit(split = "_._") %>%
@@ -117,7 +118,7 @@ to_word <- function(
   # format column names to have n=yy on the bottom
   # this only works for html tables
 
-  n_obs <- ft1 %>%
+  n_obs <- ft1_data %>%
     dplyr::filter(labels == 'No. of observations') %>%
     dplyr::select(-c(group, variable, labels)) %>%
     tidyr::gather() %>%
@@ -141,11 +142,9 @@ to_word <- function(
     }
   }
 
-  group.row.id <- NULL
-
   if(use_groups){
 
-    ft1 %<>%
+    ft1_data %<>%
       dplyr::filter(labels != 'No. of observations') %>%
       dplyr::select(
         Characteristic = labels, group, !!n_obs
@@ -153,7 +152,7 @@ to_word <- function(
 
   } else {
 
-    ft1 %<>%
+    ft1_data %<>%
       dplyr::filter(labels != 'No. of observations') %>%
       dplyr::select(Characteristic = labels, !!!n_obs)
 
@@ -165,11 +164,11 @@ to_word <- function(
 
   if(use_groups){
 
-    ft1 %<>%
+    ft1_data %<>%
       flextable::as_grouped_data(groups = 'group') %>%
-      .[is.na(.$group) | .$group != 'None', ]
+      .[is.na(.[['group']]) | .[['group']] != 'None', ]
 
-    out <- flextable::as_flextable(ft1) %>%
+    ft1_object <- flextable::as_flextable(ft1_data) %>%
       flextable::compose(
         i = ~ !is.na(group),
         j = 1,
@@ -185,7 +184,7 @@ to_word <- function(
 
     current_group = "None"
 
-    group.row.id <- ft1 %>%
+    group.row.id <- ft1_data %>%
       dplyr::select(group) %>%
       dplyr::mutate(id = 1:nrow(.)) %>%
       dplyr::filter(group!="None") %>%
@@ -193,13 +192,13 @@ to_word <- function(
       dplyr::top_n(-1, id) %>%
       dplyr::pull(id)
 
-    for(i in seq_along(ft1$group)){
+    for(i in seq_along(ft1_data[['group']])){
 
       first_val = FALSE
 
-      if(!is.na(ft1$group[i])){
+      if(!is.na(ft1_data[['group']][i])){
         first_val = TRUE
-        current_group = ft1$group[i]
+        current_group = ft1_data[['group']][i]
       }
 
       if(current_group != 'None' & !first_val){
@@ -211,7 +210,7 @@ to_word <- function(
   } else {
 
     first_indent <- NULL
-    out <- flextable::flextable(ft1)
+    ft1_object <- flextable::flextable(ft1_data)
 
   }
 
@@ -221,7 +220,7 @@ to_word <- function(
     dplyr::slice(-1) %>%
     dplyr::pull(labels)
 
-  second_indent = which(ft1$Characteristic %in% fct_levels)
+  second_indent = which(ft1_data$Characteristic %in% fct_levels)
 
   one_bump <- union(first_indent, second_indent)
   two_bump <- if(is.null(first_indent)){
@@ -232,50 +231,26 @@ to_word <- function(
 
   if(include_1st_header){
 
-    if(!is.null(ft1_decor$header)){
-      out %<>% flextable::add_header(
-        values = set_names(
-          rep(names(ft1_decor$header), ft1_decor$header),
-          setdiff(names(ft1),"group")
-        )
-      ) %>%
-        flextable::merge_h(i = 1, part = 'header')
-    }
+    ft1_object %<>% add_ft_header(ft1_data, ft1_decor$header)
 
   }
 
   if(include_2nd_header){
 
-    if(!is.null(ft1_decor$midder)){
-      out %<>% flextable::add_header(
-        values = set_names(
-          rep(names(ft1_decor$midder), ft1_decor$midder),
-          setdiff(names(ft1),"group")
-        )
-      ) %>%
-        flextable::merge_h(i = 1, part = 'header')
-    }
+    ft1_object %<>% add_ft_header(ft1_data, ft1_decor$midder)
 
   }
 
   if(include_3rd_header){
 
-    if(!is.null(ft1_decor$topper)){
-      out %<>% flextable::add_header(
-        values = set_names(
-          rep(names(ft1_decor$topper), ft1_decor$topper),
-          setdiff(names(ft1),"group")
-        )
-      ) %>%
-        flextable::merge_h(i = 1, part = 'header')
-    }
+    ft1_object %<>% add_ft_header(ft1_data, ft1_decor$topper)
 
   }
 
   pad_one <- if(use_groups && indent_groups) 15 else 5
   pad_two <- pad_one + 15
 
-  out %>%
+  ft_output <- ft1_object %>%
     theme_box() %>%
     flextable::align(
     j = 1,
@@ -283,8 +258,12 @@ to_word <- function(
     part = 'all'
   ) %>%
     flextable::align(
-      j = 2:(ncol(ft1)-1),
       align = 'center',
+      part = 'all'
+    ) %>%
+    flextable::align(
+      j = 1,
+      align = 'left',
       part = 'all'
     ) %>%
     flextable::padding(
@@ -297,34 +276,22 @@ to_word <- function(
       j = 1,
       padding.left = pad_two
     ) %>%
+    add_ft_footers(
+      num_headers = num_headers,
+      table_value_description = table_value_description,
+      footnote_markers = footnote_markers,
+      footnote_labels = footnote_labels,
+      table_notes = table_notes,
+      table_abbrs = table_abbrs
+    )
+
+  ft_output$ft_object %<>%
     flextable::fontsize(size = font_size, part = 'all')
 
-}
-
-#' determine which type of symbols to use for flextable footnotes
-#' @param footnote_notation character value indicating footnote symbols to use in tables. Eligible values are `symbol`, `number`, and `alphabet`.
-
-parse_flex_footers <- function(footnote_notation){
-
-  ft_symbols <- c("\u2A", "\u2020", "\u2021", "\uA7", "\u2016", "\uB6")
-  ft_symbols %<>% c(
-    paste0(ft_symbols, ft_symbols),
-    paste0(ft_symbols, ft_symbols, ft_symbols),
-    paste0(ft_symbols, ft_symbols, ft_symbols, ft_symbols)
-  )
-
-  switch(
-    EXPR = tolower(footnote_notation),
-    'symbol' = ft_symbols,
-    'number' = 1:length(ft_symbols),
-    'alphabet' = letters[1:length(ft_symbols)],
-    stop(
-      "unrecognized type of footnote notation.",
-      "\nvalid types are 'symbol', 'number', and 'alphabet'",
-      call. = FALSE)
-  )
+  ft_output
 
 }
+
 
 
 # if(apply_format_steps){

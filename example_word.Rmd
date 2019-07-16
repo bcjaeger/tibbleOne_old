@@ -21,9 +21,6 @@ library(flextable)
 library(officer)
 
 
-#source("R/to_word.R")
-
-
 data = pbc %>%
   dplyr::select(
     age, sex, status, trt, stage, ascites, bili, edema, albumin
@@ -58,6 +55,8 @@ data = pbc %>%
   ) 
 
 ```
+
+
 ```{r}
 
 data = data %>%
@@ -80,27 +79,27 @@ data = data %>%
 
 tbl_one = data %>%
   tibble_one(
-    formula = ~ . | trt,
-    include.allcats = FALSE,
+    formula = ~ . | trt*sex,
     include.freq = FALSE,
     include.pval = TRUE
   )
 
 ```
+
 # With groups example
+
 ```{r}
 
-tmp <- tbl_one %>% 
+tbl_one %>% 
   to_word(
-    use_groups = T,
-    apply_format_steps = T
-    )
+    use_groups = FALSE,
+  )
 
 tmp 
 ```
 
-\newpage
 # Without groups example
+
 ```{r}
 
 # TODO(boyiguo1): Fix the bug that when use_groups, all the first column are bolded, should relate to the use of bold function
@@ -113,5 +112,6 @@ tmp <- tbl_one %>%
     )
 
 tmp 
+
 ```
 
