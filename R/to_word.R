@@ -21,16 +21,15 @@
 # object = tbl_one
 # use_groups = FALSE
 # indent_groups = TRUE
-# font_size = 12
+# font_size = 11
 # footnote_notation = 'symbol'
 # include_1st_header = TRUE
 # include_2nd_header = TRUE
 # include_3rd_header = TRUE
-# withhold_footers = FALSE
 
 to_word <- function(
   object,
-  font_size = 12,
+  font_size = 11,
   use_groups = TRUE,
   indent_groups = TRUE,
   footnote_notation = 'symbol',
@@ -42,6 +41,8 @@ to_word <- function(
 
   # for CRAN
   group.row.id = variable = . = group = value = key = NULL
+
+  check_tibble_one_input(object)
 
   by <- attr(object, 'byvar')
   strat_data <- attr(object, 'strat')
@@ -61,12 +62,15 @@ to_word <- function(
     object %<>% dplyr::arrange(variable)
   }
 
+  # Construct table headers
   ft1_decor <- parse_kable_headers(
     table_type = table_type,
     strat_data = strat_data,
     include.pval = include.pval
   )
 
+  # Determine the number of headers in the table
+  # (this is needed to create footnotes later on)
   num_headers <- list(
     include_1st_header,
     include_2nd_header,
@@ -80,20 +84,32 @@ to_word <- function(
     ) %>%
     sum()
 
+  # data for table one
+  # factors are converted to characters so that values
+  # can easily be added or recoded in specific columns.
   ft1_data <- dplyr::mutate_if(object, is.factor, as.character)
 
   footnote_markers <- parse_flex_footers(footnote_notation)
 
+  # Initialize a vector to hold footnote labels
+  # what is a footnote label? It is the character value
+  # in a given table row where I want to add a footnote symbol
+  # i.e., if I want to add a footnote label to 'Age, years',
+  # then footnote_label = 'Age, years'
   footnote_labels <- vector(
     mode = 'character',
     length = length(table_notes)
   )
 
+  # for each footnote label...
   for(i in seq_along(footnote_labels) ){
 
+    # find rows in the table where this variable is used
     indx <- names(table_notes)[i] %>%
       grep(x = ft1_data$variable, fixed = TRUE)
 
+    # set the first occurrence of the variable to be the
+    # label where we will eventually place a footnote symbol
     footnote_labels[i] <- ft1_data[['labels']][min(indx)]
 
   }
@@ -103,6 +119,7 @@ to_word <- function(
   repair_index <- grepl(pattern = "_._", x = names(ft1_data), fixed = TRUE)
   names_need_repairing <- any(repair_index)
 
+  # Take out the _._ symbol from column names as needed
   if(names_need_repairing){
 
     names_to_repair <- names(ft1_data)[repair_index]
@@ -116,7 +133,8 @@ to_word <- function(
   }
 
   # format column names to have n=yy on the bottom
-  # this only works for html tables
+  # this only works for html / word tables.
+  # (Doesn't work for LaTex tables)
 
   n_obs <- ft1_data %>%
     dplyr::filter(labels == 'No. of observations') %>%
@@ -129,7 +147,9 @@ to_word <- function(
       )
     ) %>%
     dplyr::select(value, key) %>%
-    tibble::deframe()
+    tibble::deframe() %>%
+    {if(use_groups) c('group', .) else {.}}
+
 
   if(names_need_repairing){
     for(i in 1:length(names_to_repair)){
@@ -142,32 +162,28 @@ to_word <- function(
     }
   }
 
-  if(use_groups){
+  # filter out nobs row and select/rename columns
+  # to implement the name repair work done above
+  ft1_data %<>%
+    dplyr::filter(labels != 'No. of observations') %>%
+    dplyr::select(Characteristic = labels, !!!n_obs)
 
-    ft1_data %<>%
-      dplyr::filter(labels != 'No. of observations') %>%
-      dplyr::select(
-        Characteristic = labels, group, !!n_obs
-      )
-
-  } else {
-
-    ft1_data %<>%
-      dplyr::filter(labels != 'No. of observations') %>%
-      dplyr::select(Characteristic = labels, !!!n_obs)
-
-  }
-
-  # need to filter original data for consistency
+  # Filter original data to match table one data
   object %<>%
     dplyr::filter(labels != 'No. of observations')
 
   if(use_groups){
 
+    # convert table one data into the flextable
+    # data class for grouped data, then get rid of the
+    # artificial group row that flextable adds in
+    # for the "None" group.
     ft1_data %<>%
       flextable::as_grouped_data(groups = 'group') %>%
       .[is.na(.[['group']]) | .[['group']] != 'None', ]
 
+    # initialize the flextable object and set
+    # group rows to write just the label of the group
     ft1_object <- flextable::as_flextable(ft1_data) %>%
       flextable::compose(
         i = ~ !is.na(group),
@@ -177,13 +193,20 @@ to_word <- function(
         )
       )
 
+    # initialize a vector to identify all rows that
+    # need to be indented in the table
     first_indent <- vector(
       mode = 'integer',
       length = 0
     )
 
+    # current_group will iterate over all variable groups
+    # it starts with "None" assuming that will be the first
+    # level of the group variable.
     current_group = "None"
 
+    # identify which rows in the table correspond to
+    # the start of a new variable group.
     group.row.id <- ft1_data %>%
       dplyr::select(group) %>%
       dplyr::mutate(id = 1:nrow(.)) %>%
@@ -194,13 +217,18 @@ to_word <- function(
 
     for(i in seq_along(ft1_data[['group']])){
 
+      # Assume this row doesn't start a new group
       first_val = FALSE
 
+      # Unless the ith row of ft1_data disagrees...
       if(!is.na(ft1_data[['group']][i])){
         first_val = TRUE
+        # if it does, update the current group
         current_group = ft1_data[['group']][i]
       }
 
+      # If the current group isn't None and we
+      # haven't found a new group, indent this row.
       if(current_group != 'None' & !first_val){
         first_indent %<>% c(i)
       }
@@ -209,11 +237,15 @@ to_word <- function(
 
   } else {
 
+    # If we aren't grouping variables into bundled rows,
+    # this step becomes a whole lot simpler.
     first_indent <- NULL
     ft1_object <- flextable::flextable(ft1_data)
 
   }
 
+  # The second indentation is focused on factors
+  # each level of the factor should be indented.
   fct_levels <- object %>%
     dplyr::select(variable, labels) %>%
     dplyr::group_by(variable) %>%
@@ -222,50 +254,45 @@ to_word <- function(
 
   second_indent = which(ft1_data$Characteristic %in% fct_levels)
 
+  # indents are translated into one and two bump groups
+  # A row might be indented because it sits within a
+  # group or because it is a factor level. Hence,
+  # variables with at least one bump are the union
   one_bump <- union(first_indent, second_indent)
+
+  # variables in the two bump group are those that
+  # sit in the intersection of first/second indent.
+  # however, if first indent is NULL (i.e., indent_groups = FALSE),
+  # then the two bump group is just the second_indent rows.
   two_bump <- if(is.null(first_indent)){
     second_indent
   } else {
     intersect(first_indent, second_indent)
   }
 
+  # Add headers as specified by the user
   if(include_1st_header){
-
     ft1_object %<>% add_ft_header(ft1_data, ft1_decor$header)
-
   }
 
   if(include_2nd_header){
-
     ft1_object %<>% add_ft_header(ft1_data, ft1_decor$midder)
-
   }
 
   if(include_3rd_header){
-
     ft1_object %<>% add_ft_header(ft1_data, ft1_decor$topper)
-
   }
 
+  # Set padding for bump one and bump two
+  # if groups aren't indented, pad_one is the default pad
+  # i.e., pad one doesn't add any padding at all.
   pad_one <- if(use_groups && indent_groups) 15 else 5
   pad_two <- pad_one + 15
 
-  ft_output <- ft1_object %>%
-    theme_box() %>%
-    flextable::align(
-    j = 1,
-    align = 'left',
-    part = 'all'
-  ) %>%
-    flextable::align(
-      align = 'center',
-      part = 'all'
-    ) %>%
-    flextable::align(
-      j = 1,
-      align = 'left',
-      part = 'all'
-    ) %>%
+  # Return flextable object with a few formatting changes
+  # to make a relatively clean looking table one
+  ft1_object %>%
+    flextable::theme_box() %>%
     flextable::padding(
       i = one_bump,
       j = 1,
@@ -283,12 +310,10 @@ to_word <- function(
       footnote_labels = footnote_labels,
       table_notes = table_notes,
       table_abbrs = table_abbrs
-    )
-
-  ft_output$ft_object %<>%
-    flextable::fontsize(size = font_size, part = 'all')
-
-  ft_output
+    ) %>%
+    flextable::fontsize(size = font_size, part = 'all') %>%
+    flextable::align(align = 'center', part = 'all') %>%
+    flextable::align(j = 1, align = 'left', part = 'all')
 
 }
 

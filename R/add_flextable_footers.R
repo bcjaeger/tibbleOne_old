@@ -2,6 +2,28 @@
 #' add footers to a flextable tibbleOne object
 #' @export
 
+# ft_object = ft1_object %>%
+#   flextable::theme_box() %>%
+#   flextable::align(
+#     align = 'center',
+#     part = 'all'
+#   ) %>%
+#   flextable::align(
+#     j = 1,
+#     align = 'left',
+#     part = 'all'
+#   ) %>%
+#   flextable::padding(
+#     i = one_bump,
+#     j = 1,
+#     padding.left = pad_one
+#   ) %>%
+#   flextable::padding(
+#     i = two_bump,
+#     j = 1,
+#     padding.left = pad_two
+#   )
+
 add_ft_footers <- function(
   ft_object,
   num_headers,
@@ -12,14 +34,6 @@ add_ft_footers <- function(
   table_abbrs,
   withhold_footers = FALSE
 ){
-
-  footer_vals <- flatten(
-    list(
-      table_value_description,
-      table_notes,
-      table_abbrs
-    )
-  )
 
   ft_object %<>%
     flextable::footnote(
@@ -39,7 +53,7 @@ add_ft_footers <- function(
         i = min(which(ft_index)),
         j = 1,
         value = as_paragraph(table_notes[[k]]),
-        ref_symbols = footnote_markers[k],
+        ref_symbols = footnote_markers[k+1],
         part = 'body'
       )
 
@@ -53,10 +67,7 @@ add_ft_footers <- function(
       part = 'body'
     )
 
-  list(
-    ft_object = ft_object,
-    ft_footer = footer_vals
-  )
+  ft_object
 
 }
 

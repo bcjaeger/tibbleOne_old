@@ -4,19 +4,19 @@
 \alias{to_kable}
 \title{pass a tibble_one object into kable}
 \usage{
-to_kable(object, format = NULL, use.groups = TRUE,
-  indent.groups = TRUE, footnote_notation = "symbol",
+to_kable(object, format = NULL, use_groups = TRUE,
+  indent_groups = FALSE, footnote_notation = "symbol",
   include_1st_header = TRUE, include_2nd_header = TRUE,
-  include_3rd_header = TRUE, ...)
+  include_3rd_header = TRUE, escape = TRUE, bold_headers = TRUE, ...)
 }
 \arguments{
 \item{object}{a tibble_one object}
 
 \item{format}{character, format for printing}
 
-\item{use.groups}{T/F, should rows be grouped?}
+\item{use_groups}{T/F, should rows be grouped?}
 
-\item{indent.groups}{T/F, should entries within groups be indented? (this has no effect if `use.groups` is `FALSE`)}
+\item{indent_groups}{T/F, should entries within groups be indented? (this has no effect if `use_groups` is `FALSE`)}
 
 \item{footnote_notation}{character value indicating footnote symbols to use in tables. Eligible values are `symbol`, `number`, and `alphabet`.}
 

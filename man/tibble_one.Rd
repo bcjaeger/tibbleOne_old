@@ -4,15 +4,13 @@
 \alias{tibble_one}
 \title{make a tidy data frame with table one information}
 \usage{
-tibble_one(data, meta_data = NULL, formula = NULL, strat = NULL,
-  by = NULL, row.vars = NULL, specs_table_vals = NULL,
+tibble_one(data, formula = NULL, strat = NULL, by = NULL,
+  row.vars = NULL, meta_data = NULL, specs_table_vals = NULL,
   specs_table_tests = NULL, expand_binary_catgs = FALSE,
-  include.pval = TRUE, include.freq = FALSE, include.missinf = FALSE)
+  include_pval = TRUE, include_freq = FALSE, include.missinf = FALSE)
 }
 \arguments{
 \item{data}{a data frame}
-
-\item{meta_data}{a meta data frame. If unspecified, a meta data frame will be created using `data`.}
 
 \item{formula}{an optional formula object. The left hand side of the formula should be blank. The right hand side of the formula should contain row variables for the table. The '|' symbol can be used to include stratifying variables. If this option is used, no more than two stratifying variables should be used, and they must be separated by a * symbol. If formula is used, the strat, by, and row.vars inputs are ignored.}
 
@@ -22,11 +20,13 @@ tibble_one(data, meta_data = NULL, formula = NULL, strat = NULL,
 
 \item{row.vars}{a character vector indicating column names of row variables in the table. If unspecified, all columns are used.}
 
+\item{meta_data}{a meta data frame. If unspecified, a meta data frame will be created using `data`.}
+
 \item{expand_binary_catgs}{T/F, should all categories be included for binary categorical variables? (This only applies to binary variables.)}
 
-\item{include.pval}{T/F, should the table include a column for p-values? If p-values are included, factor variables are handled using chi-square tests, continuous variables are handled using t-tests or ANOVA, depending on the number of categories in the table stratification.}
+\item{include_pval}{T/F, should the table include a column for p-values? If p-values are included, factor variables are handled using chi-square tests, continuous variables are handled using t-tests or ANOVA, depending on the number of categories in the table stratification.}
 
-\item{include.freq}{T/F, should frequency values be included for categorical variables?}
+\item{include_freq}{T/F, should frequency values be included for categorical variables?}
 
 \item{include.missinf}{T/F, should the table include information on percent of missing values?}
 }
@@ -92,8 +92,8 @@ tbl_one = data \%>\%
   tibble_one(
     formula = ~ . | trt,
     include.allcats = FALSE,
-    include.freq = FALSE,
-    include.pval = TRUE
+    include_freq = FALSE,
+    include_pval = TRUE
   )
 
 tbl_one \%>\%

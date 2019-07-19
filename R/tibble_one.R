@@ -7,9 +7,9 @@
 #' @param strat a character value indicating the column name in data that will be used to stratify the table
 #' @param by a character value indicating the column name in data that will be used to split the table into groups, prior to stratification.
 #' @param row.vars a character vector indicating column names of row variables in the table. If unspecified, all columns are used.
-#' @param include.pval T/F, should the table include a column for p-values? If p-values are included, factor variables are handled using chi-square tests, continuous variables are handled using t-tests or ANOVA, depending on the number of categories in the table stratification.
+#' @param include_pval T/F, should the table include a column for p-values? If p-values are included, factor variables are handled using chi-square tests, continuous variables are handled using t-tests or ANOVA, depending on the number of categories in the table stratification.
 #' @param expand_binary_catgs T/F, should all categories be included for binary categorical variables? (This only applies to binary variables.)
-#' @param include.freq T/F, should frequency values be included for categorical variables?
+#' @param include_freq T/F, should frequency values be included for categorical variables?
 #' @param include.missinf T/F, should the table include information on percent of missing values?
 #' @export
 #' @importFrom dplyr 'group_by' 'bind_rows' 'case_when'
@@ -82,8 +82,8 @@
 #'   tibble_one(
 #'     formula = ~ . | trt,
 #'     include.allcats = FALSE,
-#'     include.freq = FALSE,
-#'     include.pval = TRUE
+#'     include_freq = FALSE,
+#'     include_pval = TRUE
 #'   )
 #'
 #' tbl_one %>%
@@ -104,23 +104,23 @@
 # row.vars = NULL
 # specs_table_vals = 'median'
 # specs_table_tests = NULL
-# include.pval = TRUE
-# include.freq = FALSE
+# include_pval = TRUE
+# include_freq = FALSE
 # expand_binary_catgs = FALSE
 # include.missinf = FALSE
 
 tibble_one <- function(
   data,
-  meta_data = NULL,
   formula = NULL,
   strat = NULL,
   by = NULL,
   row.vars = NULL,
+  meta_data = NULL,
   specs_table_vals = NULL,
   specs_table_tests = NULL,
   expand_binary_catgs = FALSE,
-  include.pval=TRUE,
-  include.freq=FALSE,
+  include_pval=TRUE,
+  include_freq=FALSE,
   include.missinf=FALSE
 ){
 
@@ -234,7 +234,7 @@ tibble_one <- function(
     by = NULL
   }
 
-  if( !stratified_table & include.pval ){
+  if( !stratified_table & include_pval ){
     stop(
       "You have included p-values but have not",
       " indicated which groups to compare.",
@@ -243,6 +243,26 @@ tibble_one <- function(
       call. = FALSE
     )
   }
+
+
+  # Ordered factors need to be re-factored as unordered.
+  # (This has to do with the default contrast method in R)
+
+  fctrs <- purrr::map_lgl(data, is.factor) %>%
+    enframe(value = 'factor') %>%
+    filter(factor == TRUE) %>%
+    mutate(ordered = map_lgl(name, ~is.ordered(data[[.x]])))
+
+  if(any(fctrs$ordered)){
+
+    for(f in fctrs$name[fctrs$ordered]){
+
+      data[[f]] %<>% factor(ordered = FALSE, levels = levels(data[[f]]))
+
+    }
+
+  }
+
 
   # meta data set is compiled if needed
   mta_data <- meta_data %||% build_meta(data, expand_binary_catgs) %>%
@@ -281,31 +301,32 @@ tibble_one <- function(
   spec_medns <- any('median' %in% specs_table_vals)
 
   # determine how to describe these specs
-  table_value_description <- if ( spec_means && spec_medns ) {
+  table_value_description <-
+    if ( spec_means && spec_medns ) {
 
-    paste(
-      "Table values for continuous variables are mean (standard deviation)",
-      "or median [interquartile range]. Table values for categorical",
-      "variables are", if(include.freq) "count (percent)." else "percent."
+      paste(
+        "Table values for continuous variables are mean (standard deviation)",
+        "or median [interquartile range]. Table values for categorical",
+        "variables are", if(include_freq) "count (percent)." else "percent."
       )
 
-  } else if (spec_means && !spec_medns) {
+    } else if (spec_means && !spec_medns) {
 
-    paste(
-      "Table values are mean (standard deviation) and",
-      if(include.freq) "count (percent)" else "percent",
-      "for continuous and categorical variables, respectively."
-    )
+      paste(
+        "Table values are mean (standard deviation) and",
+        if(include_freq) "count (percent)" else "percent",
+        "for continuous and categorical variables, respectively."
+      )
 
-  } else if (!spec_means && spec_medns) {
+    } else if (!spec_means && spec_medns) {
 
-    paste(
-      "Table values are median [interquartile range] and",
-      if(include.freq) "count (percent)" else "percent",
-      "for continuous and categorical variables, respectively."
-    )
+      paste(
+        "Table values are median [interquartile range] and",
+        if(include_freq) "count (percent)" else "percent",
+        "for continuous and categorical variables, respectively."
+      )
 
-  }
+    }
 
   # Create sample size values
   n_obs <- c(
@@ -376,7 +397,7 @@ tibble_one <- function(
   }
 
   # modify n_obs vector to include p-value label if needed
-  if( include.pval ){ n_obs %<>% c("P-value" = '') }
+  if( include_pval ){ n_obs %<>% c("P-value" = '') }
 
   # the top row of the table is initialized here (descr = descriptive)
   descr_row <- vibble(n_obs)
@@ -433,8 +454,8 @@ tibble_one <- function(
             var_type = .var_type,
             fun_type = .fun_type,
             test_type = .test_type,
-            include.pval = include.pval,
-            include.freq = include.freq,
+            include_pval = include_pval,
+            include_freq = include_freq,
             stratified_table = stratified_table,
             expand_binary_catgs = expand_binary_catgs
           )
@@ -479,7 +500,7 @@ tibble_one <- function(
   attr(table_data, 'type')  <- table_type
   attr(table_data, 'strat') <- strat_data
   attr(table_data, 'byvar') <- by
-  attr(table_data, 'pvals') <- include.pval
+  attr(table_data, 'pvals') <- include_pval
   attr(table_data, 'abbrs') <- table_abbrs
   attr(table_data, 'notes') <- table_notes
   attr(table_data, 'descr') <- table_value_description

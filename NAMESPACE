@@ -3,6 +3,7 @@
 export(adapt_round)
 export(add_ft_footers)
 export(add_ft_header)
+export(add_kable_header)
 export(add_pval_to_header)
 export(build_meta)
 export(capitalize)

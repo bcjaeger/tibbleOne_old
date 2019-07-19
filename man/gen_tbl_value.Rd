@@ -5,16 +5,16 @@
 \title{generate table one values for a column variable}
 \usage{
 gen_tbl_value(data, variable, var_type, fun_type, test_type,
-  stratified_table, include.pval, include.freq, expand_binary_catgs)
+  stratified_table, include_pval, include_freq, expand_binary_catgs)
 }
 \arguments{
 \item{data}{a data frame}
 
 \item{variable}{character value, column name of the variable}
 
-\item{include.pval}{T/F, should the table include a column for p-values? If p-values are included, factor variables are handled using chi-square tests, continuous variables are handled using t-tests or ANOVA, depending on the number of categories in the table stratification.}
+\item{include_pval}{T/F, should the table include a column for p-values? If p-values are included, factor variables are handled using chi-square tests, continuous variables are handled using t-tests or ANOVA, depending on the number of categories in the table stratification.}
 
-\item{include.freq}{T/F, should frequency values be included for categorical variables?}
+\item{include_freq}{T/F, should frequency values be included for categorical variables?}
 
 \item{expand_binary_catgs}{T/F, should all categories be included for binary categorical variables? (This only applies to binary variables.)}
 

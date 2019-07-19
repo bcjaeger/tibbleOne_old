@@ -5,7 +5,7 @@
 \title{add footers to a flextable tibbleOne object}
 \usage{
 add_ft_footers(ft_object, num_headers, table_value_description,
-  footnote_markers, footnote_labels, table_notes, tabble_abbrs,
+  footnote_markers, footnote_labels, table_notes, table_abbrs,
   withhold_footers = FALSE)
 }
 \description{

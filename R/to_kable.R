@@ -3,8 +3,8 @@
 #' @param object a tibble_one object
 #' @param ... arguments passed to kable function
 #' @param format character, format for printing
-#' @param use.groups T/F, should rows be grouped?
-#' @param indent.groups T/F, should entries within groups be indented? (this has no effect if `use.groups` is `FALSE`)
+#' @param use_groups T/F, should rows be grouped?
+#' @param indent_groups T/F, should entries within groups be indented? (this has no effect if `use_groups` is `FALSE`)
 #' @param footnote_notation character value indicating footnote symbols to use in tables. Eligible values are `symbol`, `number`, and `alphabet`.
 #' @param include_1st_header T/F, should bottom header be included?
 #' @param include_2nd_header T/F, should middle header be included?
@@ -16,27 +16,34 @@
 #'
 
 # object = tbl_one
-# format=NULL
-# use.groups=TRUE
+# format='latex'
+# use_groups=TRUE
+# indent_groups = FALSE
 # footnote_notation = 'symbol'
 # include_1st_header = TRUE
 # include_2nd_header = TRUE
 # include_3rd_header = TRUE
+# escape = TRUE
+# bold_headers = TRUE
 
 to_kable <- function(
   object,
   format=NULL,
-  use.groups=TRUE,
-  indent.groups = TRUE,
+  use_groups=TRUE,
+  indent_groups = FALSE,
   footnote_notation = 'symbol',
   include_1st_header = TRUE,
   include_2nd_header = TRUE,
   include_3rd_header = TRUE,
+  escape = TRUE,
+  bold_headers = TRUE,
   ...
 ){
 
   # for CRAN
   variable = . = group = value = key = NULL
+
+  check_tibble_one_input(object)
 
   by <- attr(object, 'byvar')
   strat_data <- attr(object, 'strat')
@@ -52,16 +59,16 @@ to_kable <- function(
     format = getOption("knitr.table.format")
 
   if (all(object$group == 'None')) {
-    use.groups = FALSE
+    use_groups = FALSE
   }
 
-  if(!use.groups){
+  if(!use_groups){
     object %<>% dplyr::arrange(variable)
   }
 
   if (include.pval & format == 'latex') {
 
-    object$kable_data[['P-value']] %<>%
+    object[['P-value']] %<>%
       paste("$",.,'$') %>%
       gsub(
         pattern = '<',
@@ -103,7 +110,7 @@ to_kable <- function(
     indx <- names(table_notes)[i] %>%
       grep(x = k1$variable, fixed = TRUE)
 
-    k1$labels[min(indx)] %<>%
+    k1[['labels']][min(indx)] %<>%
       paste0(footnote_marker_fun(i+1))
 
   }
@@ -181,7 +188,10 @@ to_kable <- function(
 
   k1 %<>%
     knitr::kable(
-      align = c("l",rep("c",ncol(.)-1)), escape = FALSE#, ...
+      align = c("l",rep("c",ncol(.)-1)),
+      escape = escape,
+      format = format,
+      ...
     ) %>%
     kableExtra::add_indent(
       positions = find_indent_rows(object$variable)
@@ -189,16 +199,16 @@ to_kable <- function(
     kableExtra::add_footnote(
       label = c(table_value_description, table_notes),
       threeparttable = TRUE,
-      escape = FALSE,
+      escape = escape,
       notation = footnote_notation
     ) %>%
     kableExtra::add_footnote(
       label = table_abbrs,
-      escape = FALSE,
+      escape = escape,
       notation = 'none'
     )
 
-  if(use.groups){
+  if(use_groups){
 
     grp_tbl = table(object$group)
 
@@ -215,36 +225,43 @@ to_kable <- function(
         latex_gap_space = "0.5em",
         hline_after = TRUE,
         extra_latex_after = "\\\\[-0.5em]",
-        indent = indent.groups
+        indent = indent_groups
       )
 
   }
 
   if(include_1st_header){
-    k1 %<>%
-      kableExtra::add_header_above(
-        header = k1_decor$header,
-        bold = TRUE,
-        escape = FALSE
-      )
+
+    k1 %<>% add_kable_header(
+      escape = escape,
+      bold = bold_headers,
+      header = k1_decor$header
+    )
+
   }
 
   if(include_2nd_header){
-    k1 %<>%
-      kableExtra::add_header_above(
-        header = k1_decor$midder,
-        bold = TRUE,
-        escape = FALSE
+
+    if(!is.null(k1_decor$midder)){
+      k1 %<>% add_kable_header(
+        escape = escape,
+        bold = bold_headers,
+        header = k1_decor$midder
       )
+    }
+
   }
 
   if(include_3rd_header){
-    k1 %<>%
-      kableExtra::add_header_above(
-        header = k1_decor$topper,
-        bold = TRUE,
-        escape = FALSE
+
+    if(!is.null(k1_decor$topper)){
+      k1 %<>% add_kable_header(
+        escape = escape,
+        bold = bold_headers,
+        header = k1_decor$topper
       )
+    }
+
   }
 
   k1

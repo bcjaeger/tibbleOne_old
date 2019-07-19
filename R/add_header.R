@@ -34,3 +34,25 @@ add_ft_header <- function(object, object_data, kable_header = NULL){
 
 }
 
+
+#' add headers to flextable object using a kable header vector.
+#' @param object a kable object
+#' @param escape T/F should special characters be ignored?
+#' @param bold T/F should the header be bold?
+#' @param header a vector header compatible with kableExtra `add_header_above`
+#' @export
+
+add_kable_header <- function(object, escape, bold, header = NULL){
+
+  if(!is.null(header)){
+    object %<>%
+      kableExtra::add_header_above(
+        header = header,
+        bold = bold,
+        escape = escape
+      )
+  }
+
+  object
+
+}

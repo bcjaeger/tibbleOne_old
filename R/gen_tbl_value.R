@@ -11,8 +11,8 @@
 # var_type = 'numeric'
 # fun_type = 'mean'
 # test_type = 'param'
-# include.pval = include.pval
-# include.freq = include.freq
+# include_pval = include_pval
+# include_freq = include_freq
 # stratified_table = stratified_table
 # expand_binary_catgs = expand_binary_catgs
 
@@ -23,8 +23,8 @@ gen_tbl_value <- function(
   fun_type,
   test_type,
   stratified_table,
-  include.pval,
-  include.freq,
+  include_pval,
+  include_freq,
   expand_binary_catgs
 ){
 
@@ -49,7 +49,7 @@ gen_tbl_value <- function(
       variable = variable,
       ctns_fun = ctns_fun,
       pval_fun = pval_fun,
-      include.pval = include.pval,
+      include_pval = include_pval,
       stratified_table = stratified_table
     )
 
@@ -63,8 +63,8 @@ gen_tbl_value <- function(
       variable = variable,
       data = data,
       stratified_table = stratified_table,
-      include.pval=include.pval,
-      include.freq = include.freq,
+      include_pval=include_pval,
+      include_freq = include_freq,
       expand_binary_catgs=expand_binary_catgs
     )
 
@@ -85,7 +85,7 @@ gen_tbl_value <- function(
 #' @param variable character value, column name of the variable
 #' @param data a data frame
 #' @param stratified_table T/F, should table values be stratified?
-#' @param include.pval T/F, should the table include a column for p-values?
+#' @param include_pval T/F, should the table include a column for p-values?
 #' @param include.missinf T/F, should the table include information on percent of missing values?
 #' @export
 #' @importFrom stats 'anova' 't.test' 'lm' 'as.formula'
@@ -99,7 +99,7 @@ ctns_tbl_value <- function(
   ctns_fun,
   pval_fun,
   stratified_table,
-  include.pval
+  include_pval
 ){
 
   .=NULL
@@ -114,7 +114,7 @@ ctns_tbl_value <- function(
     )
   }
 
-  if(stratified_table & include.pval){
+  if(stratified_table & include_pval){
 
     pval <- pval_fun(
       data = data,
@@ -124,7 +124,7 @@ ctns_tbl_value <- function(
 
     vals <- c(Overall=vals_overall, vals_by_group, 'P-value' = pval)
 
-  } else if(stratified_table & !include.pval) {
+  } else if(stratified_table & !include_pval) {
 
     vals <- c(Overall=vals_overall, vals_by_group)
 
@@ -217,8 +217,8 @@ cmp_pval_noparm <- function(data, variable, ngrps){
 #' @param variable character value, column name of the variable
 #' @param data a data frame
 #' @param stratified_table T/F, should table values be stratified?
-#' @param include.pval T/F, should the table include a column for p-values?
-#' @param include.freq T/F, should frequency values be included for categorical variables?
+#' @param include_pval T/F, should the table include a column for p-values?
+#' @param include_freq T/F, should frequency values be included for categorical variables?
 #' @param expand_binary_catgs T/F, should all categories be included for categorical variables?
 #' @param include.missinf T/F, should the table include information on percent of missing values?
 #' @export
@@ -230,8 +230,8 @@ catg_tbl_value <- function(
   variable,
   data,
   stratified_table,
-  include.pval=TRUE,
-  include.freq=FALSE,
+  include_pval=TRUE,
+  include_freq=FALSE,
   expand_binary_catgs=FALSE,
   include.missinf=FALSE
 ){
@@ -256,7 +256,7 @@ catg_tbl_value <- function(
 
   }
 
-  if(include.freq){
+  if(include_freq){
 
     cells_overall <- paste0(
       counts_overall, ' (',
@@ -309,7 +309,7 @@ catg_tbl_value <- function(
     }
   }
 
-  if(stratified_table & include.pval){
+  if(stratified_table & include_pval){
 
     n_reps <-
       if(expand_binary_catgs){
@@ -354,7 +354,7 @@ catg_tbl_value <- function(
 
     }
 
-  } else if(stratified_table & !include.pval) {
+  } else if(stratified_table & !include_pval) {
 
     if(expand_binary_catgs | n_groups > 2){
 

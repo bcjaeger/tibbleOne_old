@@ -19,6 +19,7 @@ Imports:
     dplyr,
     tidyr,
     rlang,
+    glue,
     labelled,
     officer,
     forcats,

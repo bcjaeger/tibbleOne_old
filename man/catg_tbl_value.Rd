@@ -4,8 +4,8 @@
 \alias{catg_tbl_value}
 \title{generate table values for a categorical variable}
 \usage{
-catg_tbl_value(variable, data, stratified_table, include.pval = TRUE,
-  include.freq = FALSE, expand_binary_catgs = FALSE,
+catg_tbl_value(variable, data, stratified_table, include_pval = TRUE,
+  include_freq = FALSE, expand_binary_catgs = FALSE,
   include.missinf = FALSE)
 }
 \arguments{
@@ -15,9 +15,9 @@ catg_tbl_value(variable, data, stratified_table, include.pval = TRUE,
 
 \item{stratified_table}{T/F, should table values be stratified?}
 
-\item{include.pval}{T/F, should the table include a column for p-values?}
+\item{include_pval}{T/F, should the table include a column for p-values?}
 
-\item{include.freq}{T/F, should frequency values be included for categorical variables?}
+\item{include_freq}{T/F, should frequency values be included for categorical variables?}
 
 \item{expand_binary_catgs}{T/F, should all categories be included for categorical variables?}
 

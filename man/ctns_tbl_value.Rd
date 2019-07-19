@@ -5,7 +5,7 @@
 \title{generate mean and standard deviation values for a continuous variable}
 \usage{
 ctns_tbl_value(data, variable, ctns_fun, pval_fun, stratified_table,
-  include.pval)
+  include_pval)
 }
 \arguments{
 \item{data}{a data frame}
@@ -14,7 +14,7 @@ ctns_tbl_value(data, variable, ctns_fun, pval_fun, stratified_table,
 
 \item{stratified_table}{T/F, should table values be stratified?}
 
-\item{include.pval}{T/F, should the table include a column for p-values?}
+\item{include_pval}{T/F, should the table include a column for p-values?}
 
 \item{include.missinf}{T/F, should the table include information on percent of missing values?}
 }
