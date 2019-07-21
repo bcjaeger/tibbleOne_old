@@ -27,14 +27,14 @@ aesthetic changes to the data:
 
 library(labelled)
 library(tidyverse)
-#> -- Attaching packages ------------------------------------------------------------------ tidyverse 1.2.1 --
+#> -- Attaching packages --------------------------------------------------------------------- tidyverse 1.2.1 --
 #> v tibble  2.1.3     v purrr   0.3.2
 #> v tidyr   0.8.3     v dplyr   0.8.3
 #> v readr   1.3.1     v stringr 1.4.0
 #> v tibble  2.1.3     v forcats 0.4.0
 #> Warning: package 'tidyr' was built under R version 3.6.1
 #> Warning: package 'dplyr' was built under R version 3.6.1
-#> -- Conflicts --------------------------------------------------------------------- tidyverse_conflicts() --
+#> -- Conflicts ------------------------------------------------------------------------ tidyverse_conflicts() --
 #> x dplyr::filter() masks stats::filter()
 #> x dplyr::lag()    masks stats::lag()
 library(magrittr)
@@ -118,8 +118,8 @@ pass along to an Rmarkdown document.
 tbl_one = data %>%
   tibble_one(
     formula = ~ . | trt,
-    include.freq = FALSE,
-    include.pval = TRUE
+    include_freq = FALSE,
+    include_pval = TRUE
   )
 ```
 
@@ -131,8 +131,9 @@ like the type of Table 1 that you may see in a published article.
 
 tbl_one %>% 
   to_kable(
-    use.groups = TRUE,
-    indent.groups = FALSE
+    use_groups = TRUE,
+    indent_groups = FALSE,
+    escape = FALSE
   ) %>%
   kable_styling(
     position = 'center',

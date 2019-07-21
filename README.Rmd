@@ -101,8 +101,8 @@ Now we can apply the `tibble_one` function to get an object that we can pass alo
 tbl_one = data %>%
   tibble_one(
     formula = ~ . | trt,
-    include.freq = FALSE,
-    include.pval = TRUE
+    include_freq = FALSE,
+    include_pval = TRUE
   )
 
 ```
@@ -113,8 +113,9 @@ Last step, we pass `tbl_one` into the `to_kable()` function, which provides a co
 
 tbl_one %>% 
   to_kable(
-    use.groups = TRUE,
-    indent.groups = FALSE
+    use_groups = TRUE,
+    indent_groups = FALSE,
+    escape = FALSE
   ) %>%
   kable_styling(
     position = 'center',
