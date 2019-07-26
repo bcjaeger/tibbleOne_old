@@ -465,8 +465,12 @@ tibble_one <- function(
     ) %>%
     mutate(
       variable = factor(variable, levels = c('descr', row.vars)),
-      group = factor(group),
-      group = fct_relevel(group, 'None'),
+      group = factor(group,
+                     levels = unique(
+                       c("None", attr(tbl_data, "group_levels", exact = T))
+                       )
+                     ),
+      #group = fct_relevel(group, 'None'),
       labels = case_when(
         !is.na(unit) ~ paste(labels, unit, sep = ', '),
         TRUE ~ labels

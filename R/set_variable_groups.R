@@ -7,6 +7,12 @@
 #' @export
 #' @importFrom magrittr '%>%' 'set_names'
 
+
+# data = data
+input_values <- list(Outcomes = c('status'),
+  Exposures = c('ascites','bili','edema','trt','albumin','stage'))
+#
+
 set_variable_groups <- function(data, ...){
 
   input_values <- list(...)
@@ -25,6 +31,9 @@ set_variable_groups <- function(data, ...){
     }
   }
 
+
+  # TODO(boyiguo1): Add the level of previous group attr in.
+
   values <- .values %>%
     as.list() %>%
     magrittr::set_names(.names)
@@ -36,8 +45,14 @@ set_variable_groups <- function(data, ...){
       attr(data[[v]], "group") <- values[[v]]
     }
   }
-  data
 
+  if(is.null(attr(data, "group_levels", exact = T))) {
+    attr(data, "group_levels") <- c("None", unique(.values))
+  } else {
+    attr(data, "group_levels") <- unique(c("None", attr(data, "group_levels", exact = T), .values))
+  }
+
+  data
 }
 
 #' get the group attribute of a variable
