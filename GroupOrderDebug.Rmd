@@ -1,7 +1,7 @@
 ---
-title: "Example_Word"
+title: "GroupOrderDebug"
 author: "Boyi Guo"
-date: "6/26/2019"
+date: "7/27/2019"
 output: word_document
 ---
 
@@ -9,9 +9,9 @@ output: word_document
 knitr::opts_chunk$set(echo = F, message = F, warning = F)
 ```
 
-```{r example}
-
-#devtools::install_github('boyiguo1/KableOne')
+```{r Data Prep}
+# Install current branch from Github
+# devtools::install_github('boyiguo1/KableOne', ref = "Group-Order")
 
 library(labelled)
 library(tidyverse)
@@ -22,10 +22,7 @@ library(KableOne)
 library(flextable)
 library(officer)
 
-
-#source("R/to_word.R")
-
-
+# Prepare data
 data = pbc %>%
   dplyr::select(
     age, sex, trt, stage, ascites, bili, edema, albumin, status
@@ -59,59 +56,108 @@ data = pbc %>%
     )
   ) 
 
-
-data = data %>%
-  set_variable_labels(
-    status = "Status at last contact",
-    trt = "Treatment group",
-    age = 'Age, years',
-    sex = 'Sex at birth',
-    ascites = 'Ascites',
-    bili = 'Bilirubin levels, mg/dl',
-    edema = 'Is there Edema?'
-  ) %>%
-  set_variable_groups(
-    Outcomes = c('status'),
-    Exposures = c('ascites','bili','edema','trt','albumin','stage')
-  ) 
+# Ignored due to simplicity
+# data = data %>%
+#   set_variable_labels(
+#     status = "Status at last contact",
+#     trt = "Treatment group",
+#     age = 'Age, years',
+#     sex = 'Sex at birth',
+#     ascites = 'Ascites',
+#     bili = 'Bilirubin levels, mg/dl',
+#     edema = 'Is there Edema?'
+#   ) 
 ```
 
-```{r}
 
-tbl_one = data %>%
+# Without Groups
+## Base Case
+Expectation: We are expecting the order of the vairables follows the same order as speficied in the the formula.
+```{r}
+data %>% 
   tibble_one(
     formula = ~ . | trt,
     include.allcats = FALSE,
     include.freq = FALSE,
     include.pval = TRUE
-  )
-
+  ) %>% to_word
 ```
-# With groups example
-```{r}
 
-tmp <- tbl_one %>% 
-  to_word(
-    use_groups = T,
-    apply_format_steps = T
+
+# With Groups
+```{r}
+data.1 <- data %>%
+  set_variable_groups(
+    Outcomes = c('status'),
+    Exposures = c('ascites','bili','edema','trt','albumin','stage')
+  ) 
+```
+## Groups are assigned but not used when creating table
+Expectation: The same result as in _Without Groups: Base Case_.
+```{r}
+data.1 %>% 
+  tibble_one(
+    formula = ~ . | trt,
+    include.allcats = FALSE,
+    include.freq = FALSE,
+    include.pval = TRUE
+  ) %>% to_word(use_groups = F)
+```
+Solution: move the use_groups argument from __to_word__ to __tibble_one__ so that we know how to set the level order in __tibble_one__
+
+## Groups are assigned and used when creating table
+Epectation: The same order as specified in group, with variables not specified at the top of the table
+```{r}
+data.1 %>% 
+  tibble_one(
+    formula = ~ . | trt,
+    include.allcats = FALSE,
+    include.freq = FALSE,
+    include.pval = TRUE
+  ) %>% to_word()
+```
+
+
+## One variable in different groups
+Expectation: order as the same as specified. Variable group will be updated based on its last appearance in any groups. Meanwhile, a warning message shows that indicates which variable is updated.
+```{r}
+data.2 <- data %>%
+  set_variable_groups(
+    Outcomes = c('status', 'stage'),
+    Exposures = c('ascites','bili','edema','trt','albumin','stage')
+  ) 
+
+data.2 %>% 
+  tibble_one(
+    formula = ~ . | trt,
+    include.allcats = FALSE,
+    include.freq = FALSE,
+    include.pval = TRUE
+  ) %>% to_word()
+```
+
+
+
+# With Multiple Group Assignment
+Expectation: same as if in one call to __set_variable_groups__
+```{r}
+data.3 <- data %>%
+  set_variable_groups(
+    Outcomes = c('status', 'stage')
+  ) 
+data.3 <- data.3 %>% 
+  set_variable_groups(
+    Exposures = c('ascites','bili','edema','trt','albumin','stage')
     )
 
-tmp 
+data.3 %>% 
+  tibble_one(
+    formula = ~ . | trt,
+    include.allcats = FALSE,
+    include.freq = FALSE,
+    include.pval = TRUE
+  ) %>% to_word()
 ```
 
-\newpage
-# Without groups example
-```{r}
 
-# TODO(boyiguo1): Fix the bug that when use_groups, all the first column are bolded, should relate to the use of bold function
-  
-  
-tmp <- tbl_one %>% 
-  to_word(
-    use_groups = FALSE,
-    apply_format_steps = T
-    )
-
-tmp 
-```
 

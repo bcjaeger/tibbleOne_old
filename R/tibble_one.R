@@ -466,7 +466,12 @@ tibble_one <- function(
     mutate(
       variable = factor(variable,
                         levels = c('descr',
-                                    unique(c(attr(tbl_data, "var_levels", exact = T), row.vars))
+                                    unique(
+                                      c(
+                                        setdiff(row.vars, attr(tbl_data, "var_levels", exact = T)), # order for variables without group assignment
+                                        attr(tbl_data, "var_levels", exact = T), # Order for variables with group assignment
+                                        row.vars)
+                                      )
                                    )
                         ),
       group = factor(group,
