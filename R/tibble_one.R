@@ -464,7 +464,11 @@ tibble_one <- function(
       .
     ) %>%
     mutate(
-      variable = factor(variable, levels = c('descr', row.vars)),
+      variable = factor(variable,
+                        levels = c('descr',
+                                    unique(c(attr(tbl_data, "var_levels", exact = T), row.vars))
+                                   )
+                        ),
       group = factor(group,
                      levels = unique(
                        c("None", attr(tbl_data, "group_levels", exact = T))

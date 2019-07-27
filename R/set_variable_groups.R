@@ -31,9 +31,6 @@ set_variable_groups <- function(data, ...){
     }
   }
 
-
-  # TODO(boyiguo1): Add the level of previous group attr in.
-
   values <- .values %>%
     as.list() %>%
     magrittr::set_names(.names)
@@ -46,11 +43,20 @@ set_variable_groups <- function(data, ...){
     }
   }
 
+  # Create Group Levels
   if(is.null(attr(data, "group_levels", exact = T))) {
     attr(data, "group_levels") <- c("None", unique(.values))
   } else {
     attr(data, "group_levels") <- unique(c("None", attr(data, "group_levels", exact = T), .values))
   }
+
+  # Create Variable Levels
+  if(is.null(attr(data, "var_levels", exact = T))) {
+    attr(data, "var_levels") <- unique(.names)
+  } else {
+    attr(data, "var_levels") <- unique(c(attr(data, "var_levels", exact = T), .names))
+  }
+
 
   data
 }
