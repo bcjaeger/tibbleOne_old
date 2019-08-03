@@ -468,9 +468,22 @@ tibble_one <- function(
     tidyr::unnest() %>%
     dplyr::bind_rows(descr_row, .) %>%
     mutate(
-      variable = factor(variable, levels = c('descr', row.vars)),
-      group = factor(group),
-      group = fct_relevel(group, 'None'),
+      variable = factor(variable,
+                        levels = c('descr',
+                                    unique(
+                                      c(
+                                        setdiff(row.vars, attr(tbl_data, "var_levels", exact = T)), # order for variables without group assignment
+                                        attr(tbl_data, "var_levels", exact = T), # Order for variables with group assignment
+                                        row.vars)
+                                      )
+                                   )
+                        ),
+      group = factor(group,
+                     levels = unique(
+                       c("None", attr(tbl_data, "group_levels", exact = T))
+                       )
+                     ),
+      #group = fct_relevel(group, 'None'),
       labels = case_when(
         !is.na(unit) ~ paste(labels, unit, sep = ', '),
         TRUE ~ labels
