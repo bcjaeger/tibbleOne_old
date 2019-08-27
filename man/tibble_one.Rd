@@ -7,7 +7,8 @@
 tibble_one(data, formula = NULL, strat = NULL, by = NULL,
   row.vars = NULL, meta_data = NULL, specs_table_vals = NULL,
   specs_table_tests = NULL, expand_binary_catgs = FALSE,
-  include_pval = TRUE, include_freq = FALSE, include.missinf = FALSE)
+  include_pval = FALSE, include_freq = FALSE,
+  include.missinf = FALSE)
 }
 \arguments{
 \item{data}{a data frame}
@@ -91,7 +92,6 @@ data = pbc \%>\%
 tbl_one = data \%>\%
   tibble_one(
     formula = ~ . | trt,
-    include.allcats = FALSE,
     include_freq = FALSE,
     include_pval = TRUE
   )

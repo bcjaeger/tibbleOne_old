@@ -5,28 +5,32 @@
 
 adapt_round <- function(x){
 
+  if(all(is.na(x))) stop("All values of x are NA")
+
   x_abs <- abs(x)
 
-  for(i in seq_along(x_abs)){
+  output <- rep(NA_character_, length(x))
+
+  loop_index <- which(!is.na(x))
+
+  for(i in loop_index){
 
     if(x_abs[i] < 10) {
       dig = 2
-    } else if(x_abs[i] < 1000){
+    } else if(x_abs[i] < 100){
       dig = 1
-    } else if(x_abs[i] > 1000){
-      dig = 0
     } else {
       dig = 0
     }
 
-    x[i] <- format(
-      round(as.numeric(x[i]), dig),
-      nsmall=dig,
-      big.mark=','
+    output[i] <- format(
+      round(x[i], dig),
+      nsmall = dig,
+      big.mark = ','
     )
 
   }
 
-  x
+  output
 
 }

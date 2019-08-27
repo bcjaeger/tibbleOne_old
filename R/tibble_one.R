@@ -81,7 +81,6 @@
 #' tbl_one = data %>%
 #'   tibble_one(
 #'     formula = ~ . | trt,
-#'     include.allcats = FALSE,
 #'     include_freq = FALSE,
 #'     include_pval = TRUE
 #'   )
@@ -96,15 +95,15 @@
 #' tbl_one %>%
 #'   to_word(use.groups = FALSE)
 
-# data = analysis
+# data = data
+# formula = ~ . | sex
 # meta_data = NULL
-# formula = ~ age + status + bili + edema + albumin | sex * trt
 # strat = NULL
 # by = NULL
 # row.vars = NULL
-# specs_table_vals = 'median'
+# specs_table_vals = NULL
 # specs_table_tests = NULL
-# include_pval = TRUE
+# include_pval = FALSE
 # include_freq = FALSE
 # expand_binary_catgs = FALSE
 # include.missinf = FALSE
@@ -119,20 +118,28 @@ tibble_one <- function(
   specs_table_vals = NULL,
   specs_table_tests = NULL,
   expand_binary_catgs = FALSE,
-  include_pval=TRUE,
+  include_pval=FALSE,
   include_freq=FALSE,
   include.missinf=FALSE
 ){
 
-  .strat = label = n_unique = name = tbl_one = tbl_val = NULL
-  . = .data = type = value = variable = group = NULL
-  value = key = abbr = unit = note = NULL
 
   # Handle formula type inputs
   if( !is.null(formula) ){
 
-    formula_rhs <- paste(formula) %>%
-      magrittr::extract(length(.)) %>%
+    trms <- terms(formula)
+
+    is_two_sided <- attr(trms, 'response') == 1
+
+    if(is_two_sided){
+      stop(
+        "formula should only have variables on the right hand side of ~",
+        call. = FALSE
+      )
+    }
+
+    formula_rhs <- as.character(formula) %>%
+      gsub(pattern = "~", replacement = "", x =  ., fixed = TRUE) %>%
       str_split_trim(pattern = '|')
 
     strat <- if(length(formula_rhs) < 2){
@@ -468,24 +475,24 @@ tibble_one <- function(
     tidyr::unnest() %>%
     dplyr::bind_rows(descr_row, .) %>%
     mutate(
-      variable = factor(variable,
-                        levels = c('descr',
-                                    unique(
-                                      c(
-                                        setdiff(row.vars, attr(tbl_data, "var_levels", exact = T)), # order for variables without group assignment
-                                        attr(tbl_data, "var_levels", exact = T), # Order for variables with group assignment
-                                        row.vars)
-                                      )
-                                   )
-                        ),
-      group = factor(group,
-                     levels = unique(
-                       c("None", attr(tbl_data, "group_levels", exact = T))
-                       )
-                     ),
+      variable = factor(x = variable,
+        levels = c('descr',
+          unique(
+            c(
+              setdiff(row.vars, attr(tbl_data, "var_levels", exact = T)),
+              # order for variables without group assignment
+              attr(tbl_data, "var_levels", exact = T),
+              # Order for variables with group assignment
+              row.vars
+            )
+          ))),
+      group = factor(x = group,
+        levels = unique(c(
+          "None",
+          attr(tbl_data, "group_levels", exact = T)
+        ))),
       #group = fct_relevel(group, 'None'),
-      labels = case_when(
-        !is.na(unit) ~ paste(labels, unit, sep = ', '),
+      labels = case_when(!is.na(unit) ~ paste(labels, unit, sep = ', '),
         TRUE ~ labels
       )
     ) %>%

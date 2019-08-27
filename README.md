@@ -27,14 +27,12 @@ aesthetic changes to the data:
 
 library(labelled)
 library(tidyverse)
-#> -- Attaching packages --------------------------------------------------------------------- tidyverse 1.2.1 --
-#> v tibble  2.1.3     v purrr   0.3.2
-#> v tidyr   0.8.3     v dplyr   0.8.3
-#> v readr   1.3.1     v stringr 1.4.0
-#> v tibble  2.1.3     v forcats 0.4.0
-#> Warning: package 'tidyr' was built under R version 3.6.1
-#> Warning: package 'dplyr' was built under R version 3.6.1
-#> -- Conflicts ------------------------------------------------------------------------ tidyverse_conflicts() --
+#> -- Attaching packages ---------------------------------------------------------------------- tidyverse 1.2.1 --
+#> v tibble  2.1.3           v purrr   0.3.2      
+#> v tidyr   0.8.99.9000     v dplyr   0.8.3      
+#> v readr   1.3.1           v stringr 1.4.0      
+#> v tibble  2.1.3           v forcats 0.4.0
+#> -- Conflicts ------------------------------------------------------------------------- tidyverse_conflicts() --
 #> x dplyr::filter() masks stats::filter()
 #> x dplyr::lag()    masks stats::lag()
 library(magrittr)
@@ -54,6 +52,11 @@ library(kableExtra)
 #> 
 #>     group_rows
 library(tibbleOne)
+#> 
+#> Attaching package: 'tibbleOne'
+#> The following object is masked from 'package:labelled':
+#> 
+#>     set_variable_labels
 
 data = pbc %>%
   dplyr::select(
@@ -121,6 +124,8 @@ tbl_one = data %>%
     include_freq = FALSE,
     include_pval = TRUE
   )
+#> Warning: `cols` is now required.
+#> Please use `cols = c(labels, tbl_val)`
 ```
 
 Last step, we pass `tbl_one` into the `to_kable()` function, which
@@ -271,11 +276,11 @@ Female
 
 </tr>
 
-<tr grouplength="12">
+<tr grouplength="4">
 
 <td colspan="5" style="border-bottom: 1px solid;">
 
-<strong>Exposures</strong>
+<strong>Outcomes</strong>
 
 </td>
 
@@ -285,7 +290,7 @@ Female
 
 <td style="text-align:left;">
 
-Stage
+Status at last contact
 
 </td>
 
@@ -303,7 +308,7 @@ Stage
 
 <td style="text-align:center;">
 
-0.201
+0.894
 
 </td>
 
@@ -313,57 +318,25 @@ Stage
 
 <td style="text-align:left; padding-left: 2em;" indentlevel="1">
 
-One
+Censored
 
 </td>
 
 <td style="text-align:center;">
 
-5.10
+55.5
 
 </td>
 
 <td style="text-align:center;">
 
-7.59
+52.5
 
 </td>
 
 <td style="text-align:center;">
 
-2.60
-
-</td>
-
-<td style="text-align:center;">
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-
-Two
-
-</td>
-
-<td style="text-align:center;">
-
-22.3
-
-</td>
-
-<td style="text-align:center;">
-
-22.2
-
-</td>
-
-<td style="text-align:center;">
-
-20.8
+55.2
 
 </td>
 
@@ -377,25 +350,25 @@ Two
 
 <td style="text-align:left; padding-left: 2em;" indentlevel="1">
 
-Three
+Transplant
 
 </td>
 
 <td style="text-align:center;">
 
-37.6
+5.98
 
 </td>
 
 <td style="text-align:center;">
 
-35.4
+6.33
 
 </td>
 
 <td style="text-align:center;">
 
-41.6
+5.84
 
 </td>
 
@@ -409,29 +382,39 @@ Three
 
 <td style="text-align:left; padding-left: 2em;" indentlevel="1">
 
-Four
+Dead
 
 </td>
 
 <td style="text-align:center;">
 
-35.0
+38.5
 
 </td>
 
 <td style="text-align:center;">
 
-34.8
+41.1
 
 </td>
 
 <td style="text-align:center;">
 
-35.1
+39.0
 
 </td>
 
 <td style="text-align:center;">
+
+</td>
+
+</tr>
+
+<tr grouplength="12">
+
+<td colspan="5" style="border-bottom: 1px solid;">
+
+<strong>Exposures</strong>
 
 </td>
 
@@ -663,21 +646,11 @@ Albumin
 
 </tr>
 
-<tr grouplength="4">
-
-<td colspan="5" style="border-bottom: 1px solid;">
-
-<strong>Outcomes</strong>
-
-</td>
-
-</tr>
-
 <tr>
 
 <td style="text-align:left;">
 
-Status at last contact
+Stage
 
 </td>
 
@@ -695,7 +668,7 @@ Status at last contact
 
 <td style="text-align:center;">
 
-0.894
+0.201
 
 </td>
 
@@ -705,57 +678,25 @@ Status at last contact
 
 <td style="text-align:left; padding-left: 2em;" indentlevel="1">
 
-Censored
+One
 
 </td>
 
 <td style="text-align:center;">
 
-55.5
+5.10
 
 </td>
 
 <td style="text-align:center;">
 
-52.5
+7.59
 
 </td>
 
 <td style="text-align:center;">
 
-55.2
-
-</td>
-
-<td style="text-align:center;">
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-
-Transplant
-
-</td>
-
-<td style="text-align:center;">
-
-5.98
-
-</td>
-
-<td style="text-align:center;">
-
-6.33
-
-</td>
-
-<td style="text-align:center;">
-
-5.84
+2.60
 
 </td>
 
@@ -769,25 +710,89 @@ Transplant
 
 <td style="text-align:left; padding-left: 2em;" indentlevel="1">
 
-Dead
+Two
 
 </td>
 
 <td style="text-align:center;">
 
-38.5
+22.3
 
 </td>
 
 <td style="text-align:center;">
 
-41.1
+22.2
 
 </td>
 
 <td style="text-align:center;">
 
-39.0
+20.8
+
+</td>
+
+<td style="text-align:center;">
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+
+Three
+
+</td>
+
+<td style="text-align:center;">
+
+37.6
+
+</td>
+
+<td style="text-align:center;">
+
+35.4
+
+</td>
+
+<td style="text-align:center;">
+
+41.6
+
+</td>
+
+<td style="text-align:center;">
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+
+Four
+
+</td>
+
+<td style="text-align:center;">
+
+35.0
+
+</td>
+
+<td style="text-align:center;">
+
+34.8
+
+</td>
+
+<td style="text-align:center;">
+
+35.1
 
 </td>
 

@@ -92,6 +92,7 @@ data = data %>%
     Outcomes = c('status'),
     Exposures = c('ascites','bili','edema','trt','albumin','stage')
   ) 
+
 ```
 
 Now we can apply the `tibble_one` function to get an object that we can pass along to an Rmarkdown document. 
