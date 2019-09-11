@@ -2,15 +2,15 @@
 % Please edit documentation in R/parse_kable_headers.R
 \name{parse_kable_headers}
 \alias{parse_kable_headers}
-\title{create headers for kable objects created from `tibble_one` objects.}
+\title{create headers for kable objects created from \code{tibble_one} objects.}
 \usage{
 parse_kable_headers(table_type, ...)
 }
 \arguments{
-\item{table_type}{the type of `tibble_one` object. Valid inputs are 'single_decker', 'double_decker', and 'triple_decker'}
+\item{table_type}{the type of \code{tibble_one} object. Valid inputs are 'single_decker', 'double_decker', and 'triple_decker'}
 
-\item{...}{other arguments passed to `single_header`, `double_header`, or `triple_header` functions.}
+\item{...}{other arguments passed to \code{single_header}, \code{double_header}, or \code{triple_header} functions.}
 }
 \description{
-create headers for kable objects created from `tibble_one` objects.
+create headers for kable objects created from \code{tibble_one} objects.
 }

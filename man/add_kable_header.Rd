@@ -13,7 +13,7 @@ add_kable_header(object, escape, bold, header = NULL)
 
 \item{bold}{T/F should the header be bold?}
 
-\item{header}{a vector header compatible with kableExtra `add_header_above`}
+\item{header}{a vector header compatible with kableExtra \code{add_header_above}}
 }
 \description{
 add headers to flextable object using a kable header vector.

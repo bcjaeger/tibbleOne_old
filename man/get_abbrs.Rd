@@ -10,7 +10,7 @@ get_abbrs(data, col)
 \arguments{
 \item{data}{a dataframe.}
 
-\item{col}{a column name in `data`}
+\item{col}{a column name in \code{data}}
 }
 \description{
 If abbreviations for this column are null, return missing value.

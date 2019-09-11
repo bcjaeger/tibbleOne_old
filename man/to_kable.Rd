@@ -16,9 +16,9 @@ to_kable(object, format = NULL, use_groups = TRUE,
 
 \item{use_groups}{T/F, should rows be grouped?}
 
-\item{indent_groups}{T/F, should entries within groups be indented? (this has no effect if `use_groups` is `FALSE`)}
+\item{indent_groups}{T/F, should entries within groups be indented? (this has no effect if \code{use_groups} is \code{FALSE})}
 
-\item{footnote_notation}{character value indicating footnote symbols to use in tables. Eligible values are `symbol`, `number`, and `alphabet`.}
+\item{footnote_notation}{character value indicating footnote symbols to use in tables. Eligible values are \code{symbol}, \code{number}, and \code{alphabet}.}
 
 \item{include_1st_header}{T/F, should bottom header be included?}
 

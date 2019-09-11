@@ -7,5 +7,5 @@
 \title{tibbleOne: Because nobody likes making Table 1.}
 \description{
 To learn more about tibbleOne, start with the vignettes:
-`browseVignettes(package = "tibbleOne")`
+\code{browseVignettes(package = "tibbleOne")}
 }

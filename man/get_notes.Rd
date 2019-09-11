@@ -10,7 +10,7 @@ get_notes(data, col)
 \arguments{
 \item{data}{a dataframe.}
 
-\item{col}{a column name in `data`}
+\item{col}{a column name in \code{data}}
 }
 \description{
 If note of this column is null, return missing value.

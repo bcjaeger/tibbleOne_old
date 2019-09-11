@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 # tibbleOne
 
-The goal of tibbleOne is to make it easy for analysts to include a Table 1 object in both LaTeX and html markdown documents. I made this package because I was unable to get the html tables I wanted from the existing table one R packages. Notably, this package has far fewer features than the outstanding TableOne package, but it can get a readable Table 1 object into a markdown document with less effort.
+The goal of `tibbleOne` is to make it easy for analysts to include a Table 1 object in both LaTeX and html markdown documents. I made this package because I was unable to get the html tables I wanted from the existing table one R packages. Notably, this package has far fewer features than the outstanding TableOne package, but it can get a readable Table 1 object into a markdown document with less effort.
 
 ## Installation
 

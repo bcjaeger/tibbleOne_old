@@ -10,7 +10,7 @@ get_label(data, col)
 \arguments{
 \item{data}{a dataframe.}
 
-\item{col}{a column name in `data`}
+\item{col}{a column name in \code{data}}
 }
 \description{
 If var_label of this column is null, return col.

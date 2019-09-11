@@ -3,12 +3,12 @@
 
 # tibbleOne
 
-The goal of tibbleOne is to make it easy for analysts to include a Table
-1 object in both LaTeX and html markdown documents. I made this package
-because I was unable to get the html tables I wanted from the existing
-table one R packages. Notably, this package has far fewer features than
-the outstanding TableOne package, but it can get a readable Table 1
-object into a markdown document with less effort.
+The goal of `tibbleOne` is to make it easy for analysts to include a
+Table 1 object in both LaTeX and html markdown documents. I made this
+package because I was unable to get the html tables I wanted from the
+existing table one R packages. Notably, this package has far fewer
+features than the outstanding TableOne package, but it can get a
+readable Table 1 object into a markdown document with less effort.
 
 ## Installation
 
@@ -27,12 +27,12 @@ aesthetic changes to the data:
 
 library(labelled)
 library(tidyverse)
-#> -- Attaching packages ---------------------------------------------------------------------- tidyverse 1.2.1 --
+#> -- Attaching packages --------------------------------------------- tidyverse 1.2.1 --
 #> v tibble  2.1.3           v purrr   0.3.2      
 #> v tidyr   0.8.99.9000     v dplyr   0.8.3      
 #> v readr   1.3.1           v stringr 1.4.0      
 #> v tibble  2.1.3           v forcats 0.4.0
-#> -- Conflicts ------------------------------------------------------------------------- tidyverse_conflicts() --
+#> -- Conflicts ------------------------------------------------ tidyverse_conflicts() --
 #> x dplyr::filter() masks stats::filter()
 #> x dplyr::lag()    masks stats::lag()
 library(magrittr)

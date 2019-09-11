@@ -9,7 +9,7 @@ add_ft_header(object, object_data, kable_header = NULL)
 \arguments{
 \item{object}{a flextable object}
 
-\item{object_data}{the dataset used to create `object`}
+\item{object_data}{the dataset used to create \code{object}}
 
 \item{kable_header}{a header vector for kable objects.}
 }

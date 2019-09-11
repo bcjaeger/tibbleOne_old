@@ -10,7 +10,7 @@ get_groups(data, col)
 \arguments{
 \item{data}{a dataframe.}
 
-\item{col}{a column name in `data`}
+\item{col}{a column name in \code{data}}
 }
 \description{
 If group of this column is null, return missing value.

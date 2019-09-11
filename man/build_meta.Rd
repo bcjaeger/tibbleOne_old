@@ -7,7 +7,7 @@
 build_meta(data, expand_binary_catgs = FALSE)
 }
 \arguments{
-\item{data}{a data frame with any combination of the following attributes: `label`, `unit`, `group`, `abbrs`, and `notes`. Columns in the meta data are based on these attributes.}
+\item{data}{a data frame with any combination of the following attributes: \code{label}, \code{unit}, \code{group}, \code{abbrs}, and \code{notes}. Columns in the meta data are based on these attributes.}
 
 \item{expand_binary_catgs}{T/F, should all categories be included for binary categorical variables? (This only applies to binary variables.)}
 }

@@ -21,7 +21,7 @@ tibble_one(data, formula = NULL, strat = NULL, by = NULL,
 
 \item{row.vars}{a character vector indicating column names of row variables in the table. If unspecified, all columns are used.}
 
-\item{meta_data}{a meta data frame. If unspecified, a meta data frame will be created using `data`.}
+\item{meta_data}{a meta data frame. If unspecified, a meta data frame will be created using \code{data}.}
 
 \item{expand_binary_catgs}{T/F, should all categories be included for binary categorical variables? (This only applies to binary variables.)}
 
