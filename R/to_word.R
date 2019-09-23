@@ -12,11 +12,6 @@
 #' @param include_3rd_header T/F, should top header be included?
 #' @param ... arguments passed to flextable function
 #' @export
-#' @importFrom dplyr 'arrange' 'mutate' 'mutate_if' 'select' 'slice' 'filter'
-#' @importFrom knitr 'kable'
-#' @importFrom officer 'fp_border'
-#' @importFrom kableExtra 'group_rows' 'add_indent' 'add_header_above'
-#' @importFrom  flextable 'flextable'
 
 # object = tbl_one
 # use_groups = FALSE
@@ -39,9 +34,6 @@ to_word <- function(
   ...
 ){
 
-  # for CRAN
-  group.row.id = variable = . = group = value = key = NULL
-
   check_tibble_one_input(object)
 
   by <- attr(object, 'byvar')
@@ -59,7 +51,7 @@ to_word <- function(
   }
 
   if(!use_groups){
-    object %<>% dplyr::arrange(variable)
+    object %<>% arrange(variable)
   }
 
   # Construct table headers
@@ -87,7 +79,7 @@ to_word <- function(
   # data for table one
   # factors are converted to characters so that values
   # can easily be added or recoded in specific columns.
-  ft1_data <- dplyr::mutate_if(object, is.factor, as.character)
+  ft1_data <- mutate_if(object, is.factor, as.character)
 
   footnote_markers <- parse_flex_footers(footnote_notation)
 
@@ -137,8 +129,8 @@ to_word <- function(
   # (Doesn't work for LaTex tables)
 
   n_obs <- ft1_data %>%
-    dplyr::filter(labels == 'No. of observations') %>%
-    dplyr::select(-c(group, variable, labels)) %>%
+    filter(labels == 'No. of observations') %>%
+    select(-c(group, variable, labels)) %>%
     tidyr::gather() %>%
     mutate(
       value = case_when(
@@ -146,7 +138,7 @@ to_word <- function(
         TRUE ~ value
       )
     ) %>%
-    dplyr::select(value, key) %>%
+    select(value, key) %>%
     tibble::deframe() %>%
     {if(use_groups) c('group', .) else {.}}
 
@@ -165,12 +157,12 @@ to_word <- function(
   # filter out nobs row and select/rename columns
   # to implement the name repair work done above
   ft1_data %<>%
-    dplyr::filter(labels != 'No. of observations') %>%
-    dplyr::select(Characteristic = labels, !!!n_obs)
+    filter(labels != 'No. of observations') %>%
+    select(Characteristic = labels, !!!n_obs)
 
   # Filter original data to match table one data
   object %<>%
-    dplyr::filter(labels != 'No. of observations')
+    filter(labels != 'No. of observations')
 
   if(use_groups){
 
@@ -208,12 +200,12 @@ to_word <- function(
     # identify which rows in the table correspond to
     # the start of a new variable group.
     group.row.id <- ft1_data %>%
-      dplyr::select(group) %>%
-      dplyr::mutate(id = 1:nrow(.)) %>%
-      dplyr::filter(group!="None") %>%
-      dplyr::group_by(group) %>%
-      dplyr::top_n(-1, id) %>%
-      dplyr::pull(id)
+      select(group) %>%
+      mutate(id = 1:nrow(.)) %>%
+      filter(group!="None") %>%
+      group_by(group) %>%
+      top_n(-1, id) %>%
+      pull(id)
 
     for(i in seq_along(ft1_data[['group']])){
 
@@ -247,10 +239,10 @@ to_word <- function(
   # The second indentation is focused on factors
   # each level of the factor should be indented.
   fct_levels <- object %>%
-    dplyr::select(variable, labels) %>%
-    dplyr::group_by(variable) %>%
-    dplyr::slice(-1) %>%
-    dplyr::pull(labels)
+    select(variable, labels) %>%
+    group_by(variable) %>%
+    slice(-1) %>%
+    pull(labels)
 
   second_indent = which(ft1_data$Characteristic %in% fct_levels)
 
@@ -362,7 +354,7 @@ to_word <- function(
 #   if(!is.null(table_note)){
 #
 #     notes <- table_data %>%
-#       dplyr::select(label, note) %>%
+#       select(label, note) %>%
 #       unnest() %>%
 #       filter(!is.na(note))
 #

@@ -4,22 +4,22 @@
 \alias{tibble_one}
 \title{make a tidy data frame with table one information}
 \usage{
-tibble_one(data, formula = NULL, strat = NULL, by = NULL,
-  row.vars = NULL, meta_data = NULL, specs_table_vals = NULL,
+tibble_one(data, formula = NULL, row_vars = NULL, strat = NULL,
+  by = NULL, meta_data = NULL, specs_table_vals = NULL,
   specs_table_tests = NULL, expand_binary_catgs = FALSE,
   include_pval = FALSE, include_freq = FALSE,
-  include.missinf = FALSE)
+  include_miss_info = FALSE)
 }
 \arguments{
 \item{data}{a data frame}
 
-\item{formula}{an optional formula object. The left hand side of the formula should be blank. The right hand side of the formula should contain row variables for the table. The '|' symbol can be used to include stratifying variables. If this option is used, no more than two stratifying variables should be used, and they must be separated by a * symbol. If formula is used, the strat, by, and row.vars inputs are ignored.}
+\item{formula}{an optional formula object. The left hand side of the formula should be blank. The right hand side of the formula should contain row variables for the table. The '|' symbol can be used to include stratifying variables. If this option is used, no more than two stratifying variables should be used, and they must be separated by a * symbol. If formula is used, the strat, by, and row_vars inputs are ignored.}
+
+\item{row_vars}{a character vector indicating column names of row variables in the table. If unspecified, all columns are used.}
 
 \item{strat}{a character value indicating the column name in data that will be used to stratify the table}
 
 \item{by}{a character value indicating the column name in data that will be used to split the table into groups, prior to stratification.}
-
-\item{row.vars}{a character vector indicating column names of row variables in the table. If unspecified, all columns are used.}
 
 \item{meta_data}{a meta data frame. If unspecified, a meta data frame will be created using \code{data}.}
 
@@ -29,7 +29,7 @@ tibble_one(data, formula = NULL, strat = NULL, by = NULL,
 
 \item{include_freq}{T/F, should frequency values be included for categorical variables?}
 
-\item{include.missinf}{T/F, should the table include information on percent of missing values?}
+\item{include_miss_info}{T/F, should the table include information on percent of missing values?}
 }
 \description{
 make a tidy data frame with table one information

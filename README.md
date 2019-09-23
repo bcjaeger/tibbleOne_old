@@ -27,12 +27,12 @@ aesthetic changes to the data:
 
 library(labelled)
 library(tidyverse)
-#> -- Attaching packages --------------------------------------------- tidyverse 1.2.1 --
-#> v tibble  2.1.3           v purrr   0.3.2      
-#> v tidyr   0.8.99.9000     v dplyr   0.8.3      
-#> v readr   1.3.1           v stringr 1.4.0      
-#> v tibble  2.1.3           v forcats 0.4.0
-#> -- Conflicts ------------------------------------------------ tidyverse_conflicts() --
+#> -- Attaching packages ------------------------------------------------------------ tidyverse 1.2.1 --
+#> v tibble  2.1.3     v purrr   0.3.2
+#> v tidyr   1.0.0     v dplyr   0.8.3
+#> v readr   1.3.1     v stringr 1.4.0
+#> v tibble  2.1.3     v forcats 0.4.0
+#> -- Conflicts --------------------------------------------------------------- tidyverse_conflicts() --
 #> x dplyr::filter() masks stats::filter()
 #> x dplyr::lag()    masks stats::lag()
 library(magrittr)
@@ -121,11 +121,11 @@ pass along to an Rmarkdown document.
 tbl_one = data %>%
   tibble_one(
     formula = ~ . | trt,
+    strat = sex,
+    by = edema,
     include_freq = FALSE,
     include_pval = TRUE
   )
-#> Warning: `cols` is now required.
-#> Please use `cols = c(labels, tbl_val)`
 ```
 
 Last step, we pass `tbl_one` into the `to_kable()` function, which

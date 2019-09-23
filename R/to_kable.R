@@ -10,13 +10,10 @@
 #' @param include_2nd_header T/F, should middle header be included?
 #' @param include_3rd_header T/F, should top header be included?
 #' @export
-#' @importFrom dplyr 'arrange' 'mutate' 'mutate_if'
-#' @importFrom knitr 'kable'
-#' @importFrom kableExtra 'group_rows' 'add_indent' 'add_header_above'
 #'
 
 # object = tbl_one
-# format='latex'
+# format='html'
 # use_groups=TRUE
 # indent_groups = FALSE
 # footnote_notation = 'symbol'
@@ -39,9 +36,6 @@ to_kable <- function(
   bold_headers = TRUE,
   ...
 ){
-
-  # for CRAN
-  variable = . = group = value = key = NULL
 
   check_tibble_one_input(object)
 

@@ -8,7 +8,11 @@
 #' @importFrom dplyr 'select'
 #' @importFrom glue glue_collapse
 
-build_meta <- function(data, expand_binary_catgs = FALSE){
+build_meta <- function(
+  data,
+  expand_binary_catgs = FALSE,
+  max_catgs = 10
+){
 
   variable = type = n_unique = label = NULL
   unit = group = abbr = note = labels = NULL
@@ -69,17 +73,17 @@ build_meta <- function(data, expand_binary_catgs = FALSE){
       variable, label, type, unit, group, abbr, note, labels
     )
 
-  if(any(map_dbl(mta_data$labels, length)>=8)){
+  if(any(map_dbl(mta_data$labels, length)>=max_catgs)){
 
     out_variables <- map_dbl(mta_data$labels, length) %>%
       set_names(mta_data$variable) %>%
       enframe() %>%
-      filter(value >= 8) %>%
+      filter(value >= max_catgs) %>%
       mutate(out = paste0(name, ' (',value,' categories)')) %>%
       pluck('out')
 
     out_msg <- paste(
-      "Some factors have 7+ categories.",
+      "Some factors have >", max_catgs, "categories.",
       "Should these be numeric?",
       glue::glue_collapse(out_variables,sep = ", ", last = ", and "),
       sep = '\n'
@@ -90,6 +94,32 @@ build_meta <- function(data, expand_binary_catgs = FALSE){
   }
 
   mta_data
+
+}
+
+check_meta <- function(meta){
+
+  # check variable types in meta data
+  if( !all(meta$type %in% c('factor', 'numeric', 'integer')) ) {
+
+    out_variables <- meta %>%
+      dplyr::filter(!type %in% c('factor', 'numeric', 'integer')) %>%
+      mutate(variable = paste0(variable, ' (',type,')')) %>%
+      purrr::pluck('variable') %>%
+      paste(collapse = ' -- ')
+
+    out_msg <- paste(
+      "tibble_one is compatible with factor, numeric, and integer variables.",
+      "Please inspect the following variables in your input data:",
+      out_variables,
+      sep= '\n'
+    )
+
+    stop(out_msg, call. = FALSE)
+
+  }
+
+  meta
 
 }
 

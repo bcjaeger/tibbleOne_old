@@ -2,15 +2,20 @@
 % Please edit documentation in R/parse_specs.R
 \name{parse_unnamed_spec}
 \alias{parse_unnamed_spec}
-\title{handle specifications of length 1 for uniform value handling.}
+\title{specificy table values/tests.}
 \usage{
 parse_unnamed_spec(specs_default, specs_analyst)
 }
 \arguments{
-\item{specs_default}{named vector of character values. Names should be variables, while values should all be \code{default}. Only variables that are in the user-specified formula for \code{tibble_one} should be included in the \code{specs_default} vector.}
+\item{specs_default}{named vector of character values.
+Names should be variables, while values should all be \code{default}.
+Only variables that are in the user-specified formula for
+\code{tibble_one} should be included in the \code{specs_default} vector.}
 
-\item{specs_analyst}{named vector of character values. Names should be variables, while values should be specs (e.g., \code{mean}, \code{median} for values, and \code{params} or \code{noparm} for tests).}
+\item{specs_analyst}{named vector of character values.
+Names should be variables, while values should be specs
+(e.g., \code{mean}, \code{median} for values, and \code{params} or \code{noparm} for tests).}
 }
 \description{
-handle specifications of length 1 for uniform value handling.
+specificy table values/tests.
 }

@@ -4,7 +4,7 @@
 \alias{build_meta}
 \title{creates a dataset that describes the characteristics of another dataset}
 \usage{
-build_meta(data, expand_binary_catgs = FALSE)
+build_meta(data, expand_binary_catgs = FALSE, max_catgs = 10)
 }
 \arguments{
 \item{data}{a data frame with any combination of the following attributes: \code{label}, \code{unit}, \code{group}, \code{abbrs}, and \code{notes}. Columns in the meta data are based on these attributes.}

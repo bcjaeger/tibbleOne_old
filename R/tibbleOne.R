@@ -4,24 +4,34 @@
 #' To learn more about tibbleOne, start with the vignettes:
 #' `browseVignettes(package = "tibbleOne")`
 #'
-#' @importFrom tibble tibble as_tibble
-#' @importFrom forcats fct_inorder
+#' @importFrom knitr kable
+#' @importFrom officer fp_border
+#' @importFrom kableExtra group_rows add_indent add_header_above
+#' @importFrom flextable flextable
+#' @importFrom tibble tibble as_tibble deframe
+#' @importFrom forcats fct_inorder fct_relevel
+#' @importFrom labelled var_label
+#' @importFrom tibble tibble enframe
+#' @importFrom tidyr spread unnest nest gather
+#' @importFrom tidyselect vars_select
+#' @importFrom stats na.omit
+#' @importFrom kableExtra footnote_marker_number footnote_marker_symbol
+#'   footnote_marker_alphabet
+#' @importFrom stringr str_detect fixed str_split
 #' @importFrom mitml testEstimates
 #' @importFrom rlang %||% is_character ensyms
 #' @importFrom vctrs vec_size vec_is_empty
-#' @importFrom tidyr unnest spread
-#' @importFrom purrr map map_dfr map_chr map_dbl map_lgl
-#'   set_names modify pluck reduce flatten map2_lgl
+#' @importFrom purrr map pmap map_dfr map_chr map_dbl map_lgl map_int
+#'   set_names modify pluck reduce flatten map2_lgl map2_chr
 #' @importFrom tidyselect vars_pull
-#' @importFrom formula.tools lhs rhs lhs.vars rhs.vars is.one.sided
 #' @importFrom geepack geeglm
 #' @importFrom stats glm lm qnorm coef vcov as.formula update.formula
 #' @importFrom glue glue glue_collapse
-#' @importFrom magrittr %>% %<>% set_colnames
+#' @importFrom magrittr %>% %<>% set_colnames add
 #' @importFrom stats terms
 #' @importFrom flextable as_paragraph
-#' @importFrom tibble tibble enframe
-#' @importFrom dplyr left_join
+#' @importFrom dplyr select mutate filter group_by top_n pull mutate_if
+#'   left_join bind_rows case_when slice
 "_PACKAGE"
 
 ## quiets concerns of R CMD check re: the .'s that appear in pipelines
@@ -30,26 +40,26 @@ if(getRversion() >= "2.15.1")
     c(
       ".",
       ".x",
-      ".strat",
-      "label",
-      "n_unique",
-      "name",
-      "tbl_one",
-      "tbl_val",
-      ".data",
-      "type",
-      "value",
-      "variable",
-      "group",
+      'id',
       "key",
       "abbr",
       "unit",
       "note",
-      'bad_table_specs',
+      "name",
+      "type",
+      "label",
+      "group",
+      "value",
+      ".data",
+      ".strat",
+      "tbl_one",
+      "tbl_val",
+      "n_unique",
+      "variable",
       'fun_descr',
-      'id',
-      'specs_table_vals',
-      'test_descr'
+      'test_descr',
+      'group.row.id',
+      'bad_table_specs',
+      'specs_table_vals'
     )
   )
-

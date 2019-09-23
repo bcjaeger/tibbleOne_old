@@ -2,17 +2,22 @@
 % Please edit documentation in R/parse_specs.R
 \name{parse_specs}
 \alias{parse_specs}
-\title{handle specifications of table values and table tests}
+\title{specificy table values/tests}
 \usage{
 parse_specs(specs_default, specs_analyst)
 }
 \arguments{
-\item{specs_default}{named vector of character values. Names should be variables, while values should all be \code{default}. Only variables that are in the user-specified formula for \code{tibble_one} should be included in the \code{specs_default} vector.}
+\item{specs_default}{named vector of character values.
+Names should be variables, while values should all be \code{default}.
+Only variables that are in the user-specified formula for
+\code{tibble_one} should be included in the \code{specs_default} vector.}
 
-\item{specs_analyst}{named vector of character values. Names should be variables, while values should be specs (e.g., \code{mean}, \code{median} for values, and \code{params} or \code{noparm} for tests).}
+\item{specs_analyst}{named vector of character values.
+Names should be variables, while values should be specs
+(e.g., \code{mean}, \code{median} for values, and \code{params} or \code{noparm} for tests).}
 
 \item{type}{character value, should be numeric, integer, or factor}
 }
 \description{
-handle specifications of table values and table tests
+specificy table values/tests
 }

@@ -102,6 +102,8 @@ Now we can apply the `tibble_one` function to get an object that we can pass alo
 tbl_one = data %>%
   tibble_one(
     formula = ~ . | trt,
+    strat = sex,
+    by = edema,
     include_freq = FALSE,
     include_pval = TRUE
   )
