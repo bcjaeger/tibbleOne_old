@@ -13,9 +13,9 @@ select_labelled <- function(data, ...){
   new_data <- data
 
   for(i in 1:.length){
-    labelled::var_label( new_data[[ .names[i] ]] ) <- .dots[[i]]
+    var_label( new_data[[ .names[i] ]] ) <- .dots[[i]]
   }
 
-  dplyr::select_at(new_data, .names)
+  select_at(new_data, .names)
 
 }

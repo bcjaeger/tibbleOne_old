@@ -35,38 +35,33 @@
 #' @return a data frame or \code{\link[tibble]{tibble}}.
 #'
 #' @examples
-#' library(magrittr)
-#' library(knitr)
-#' library(kableExtra)
 #'
 #' df <- data.frame(
-#'   gfr = rnorm(n = 100, mean = 100, sd = 30),
-#'   sbp = rnorm(n = 100, mean = 120, sd = 20),
-#'   grp = rbinom(n = 100, size = 1, prob = 2/5)
-#' ) %>%
-#'   set_variable_labels(
-#'     gfr = 'Estimated GFR',
-#'     sbp = 'Systolic BP',
-#'     grp = 'Arbitrary grouping variable'
-#'   ) %>%
-#'   set_variable_units(
-#'     gfr = 'mL/min/1.73 m2',
-#'     sbp = 'mm Hg'
-#'   ) %>%
-#'   set_variable_abbrs(
-#'     gfr = c("GFR" = "glomerular filtration rate", "min" = 'minute'),
-#'     sbp = c("BP" = "blood pressure")
-#'   ) %>%
-#'   set_variable_notes(
-#'     sbp = "blood pressure was measured on the left arm by trained personnel"
-#'   )
+#'   gfr = c(1,2,3),
+#'   sbp = c(3,2,1)
+#' )
 #'
-#' tibble_one(
-#'   data = df,
-#'   formula =  ~ gfr + sbp | grp
-#' ) %>%
-#'   to_kable(escape = FALSE) %>%
-#'   kable_styling(full_width = FALSE)
+#' df <- set_variable_labels(df,
+#'   gfr = 'Estimated GFR',
+#'   sbp = 'Systolic BP'
+#' )
+#'
+#' df <- set_variable_units(df,
+#'   gfr = 'mL/min/1.73 m2',
+#'   sbp = 'mm Hg'
+#' )
+#'
+#' df <- set_variable_abbrs(df,
+#'   gfr = c("GFR" = "glomerular filtration rate", "min" = 'minute'),
+#'   sbp = c("BP" = "blood pressure")
+#' )
+#'
+#' df <- set_variable_notes(df,
+#'   sbp = "blood pressure was measured by trained personnel"
+#' )
+#'
+#' build_meta(df)
+#'
 #' @export
 set_variable_labels <- function(data, ...){
 

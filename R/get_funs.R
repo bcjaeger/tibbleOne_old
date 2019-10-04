@@ -3,8 +3,6 @@
 #' Otherwise, return the var_label of the column
 #' @param data a dataframe.
 #' @param col a column name in `data`
-#' @export
-#' @importFrom rlang '%||%'
 #'
 
 get_label <- function(data, col){
@@ -19,8 +17,6 @@ get_label <- function(data, col){
 #' Otherwise, return the unit of the column
 #' @param data a dataframe.
 #' @param col a column name in `data`
-#' @export
-#' @importFrom rlang '%||%'
 #'
 
 get_units <- function(data, col){
@@ -33,8 +29,6 @@ get_units <- function(data, col){
 #' Otherwise, return the abbreviations for the column
 #' @param data a dataframe.
 #' @param col a column name in `data`
-#' @export
-#' @importFrom rlang '%||%'
 #'
 
 get_abbrs <- function(data, col){
@@ -47,8 +41,6 @@ get_abbrs <- function(data, col){
 #' Otherwise, return the notes for the column
 #' @param data a dataframe.
 #' @param col a column name in `data`
-#' @export
-#' @importFrom rlang '%||%'
 #'
 
 get_notes <- function(data, col){
@@ -62,9 +54,6 @@ get_notes <- function(data, col){
 #' Otherwise, return the group of the column
 #' @param data a dataframe.
 #' @param col a column name in `data`
-#' @export
-#' @importFrom rlang '%||%'
-
 
 get_groups <- function(data, col){
 

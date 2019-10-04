@@ -3,7 +3,6 @@
 #' @param object a flextable object
 #' @param object_data the dataset used to create `object`
 #' @param kable_header a header vector for kable objects.
-#' @export
 
 # object = out
 # object_data = ft1
@@ -40,7 +39,6 @@ add_ft_header <- function(object, object_data, kable_header = NULL){
 #' @param escape T/F should special characters be ignored?
 #' @param bold T/F should the header be bold?
 #' @param header a vector header compatible with kableExtra `add_header_above`
-#' @export
 
 add_kable_header <- function(object, escape, bold, header = NULL){
 

@@ -4,8 +4,8 @@
 \alias{tibble_one}
 \title{make a tidy data frame with table one information}
 \usage{
-tibble_one(data, formula = NULL, row_vars = NULL, strat = NULL,
-  by = NULL, meta_data = NULL, specs_table_vals = NULL,
+tibble_one(data, meta_data = NULL, formula = NULL, row_vars = NULL,
+  strat = NULL, by = NULL, specs_table_vals = NULL,
   specs_table_tests = NULL, expand_binary_catgs = FALSE,
   include_pval = FALSE, include_freq = FALSE,
   include_miss_info = FALSE)
@@ -13,96 +13,63 @@ tibble_one(data, formula = NULL, row_vars = NULL, strat = NULL,
 \arguments{
 \item{data}{a data frame}
 
-\item{formula}{an optional formula object. The left hand side of the formula should be blank. The right hand side of the formula should contain row variables for the table. The '|' symbol can be used to include stratifying variables. If this option is used, no more than two stratifying variables should be used, and they must be separated by a * symbol. If formula is used, the strat, by, and row_vars inputs are ignored.}
+\item{meta_data}{a meta data frame. If unspecified, a meta data frame
+will be created using \code{data}.}
 
-\item{row_vars}{a character vector indicating column names of row variables in the table. If unspecified, all columns are used.}
+\item{formula}{an optional formula object. The left hand side of the
+formula should be blank. The right hand side of the formula should
+contain row variables for the table. The '|' symbol can be used to
+include stratifying variables. If this option is used, no more than
+two stratifying variables should be used, and they must be separated
+by a * symbol. If formula is used, the strat, by, and row_vars inputs
+are ignored.}
 
-\item{strat}{a character value indicating the column name in data that will be used to stratify the table}
+\item{row_vars}{a character vector indicating column names of row
+variables in the table. If unspecified, all columns are used.}
 
-\item{by}{a character value indicating the column name in data that will be used to split the table into groups, prior to stratification.}
+\item{strat}{a character value indicating the column name in data that
+will be used to stratify the table}
 
-\item{meta_data}{a meta data frame. If unspecified, a meta data frame will be created using \code{data}.}
+\item{by}{a character value indicating the column name in data that
+will be used to split the table into groups, prior to stratification.}
 
-\item{expand_binary_catgs}{T/F, should all categories be included for binary categorical variables? (This only applies to binary variables.)}
+\item{specs_table_vals}{named vector of character values.
+Names should be variables, while values should be specs.
+Valid specs are 'mean' and 'median' (see examples).}
 
-\item{include_pval}{T/F, should the table include a column for p-values? If p-values are included, factor variables are handled using chi-square tests, continuous variables are handled using t-tests or ANOVA, depending on the number of categories in the table stratification.}
+\item{specs_table_tests}{named vector of character values.
+Names should be variables, while values should be specs.
+Valid specs are 'params' or 'noparm' (see examples).}
 
-\item{include_freq}{T/F, should frequency values be included for categorical variables?}
+\item{expand_binary_catgs}{T/F, should all categories be included for
+binary categorical variables? (This only applies to binary variables.)}
 
-\item{include_miss_info}{T/F, should the table include information on percent of missing values?}
+\item{include_pval}{T/F, should the table include a column for p-values?
+If p-values are included, factor variables are handled using
+chi-square tests, continuous variables are handled using t-tests
+or ANOVA, depending on the number of categories in the table
+stratification.}
+
+\item{include_freq}{T/F, should frequency values be included for
+categorical variables?}
+
+\item{include_miss_info}{T/F, should the table include information
+on percent of missing values?}
 }
 \description{
 make a tidy data frame with table one information
 }
 \examples{
-library(labelled)
-library(dplyr)
-library(forcats)
-library(survival)
-library(kableExtra)
-library(flextable)
-library(tibbleOne)
+data("pbc_tbl1")
+# report median albumin instead of mean
+# use kruskal wallis test for albumin
+tibble_one(
+  pbc_tbl1,
+  formula = ~ . | trt,
+  include_freq = FALSE,
+  include_pval = TRUE,
+  specs_table_vals = c(albumin = 'median'),
+  specs_table_tests = c(albumin = 'nopars')
+)
 
-data = pbc \%>\%
-  dplyr::select(
-    age, sex, status, trt, stage, ascites, bili, edema, albumin
-  ) \%>\%
-  dplyr::mutate(
-    status=factor(
-      status, levels = c(0:2),
-      labels = c("Censored", "Transplant", "Dead")
-    ),
-    stage = factor(
-      stage, levels = c(1:4),
-      labels = c("One", "Two", "Three", "Four")
-    ),
-    trt=factor(
-      trt, levels=c(1:2),
-      labels = c("Drug A", "Drug B")
-    ),
-    ascites=factor(
-      ascites, levels=c(0:1),
-      labels = c("No", "Yes")
-    ),
-    sex = fct_recode(
-      sex,
-      'Male'='m',
-      'Female'='f'
-    ),
-    edema = factor(
-      edema,
-      levels=c(0, 0.5, 1),
-      labels=c("None", "A little", "Lots")
-    )
-  ) \%>\%
-  set_variable_labels(
-    status = "Status at last contact",
-    trt = "Treatment group",
-    age = 'Age, years',
-    sex = 'Sex at birth',
-    ascites = 'Ascites',
-    bili = 'Bilirubin levels, mg/dl',
-    edema = 'Is there Edema?'
-  ) \%>\%
-  set_variable_groups(
-    Outcomes = c('status'),
-    Exposures = c('ascites','bili','edema','trt','albumin','stage')
-  )
-
-tbl_one = data \%>\%
-  tibble_one(
-    formula = ~ . | trt,
-    include_freq = FALSE,
-    include_pval = TRUE
-  )
-
-tbl_one \%>\%
-  to_kable(format = 'html') \%>\%
-  kable_styling(
-    position = 'center',
-    bootstrap_options = c('striped')
-  )
-
-tbl_one \%>\%
-  to_word(use.groups = FALSE)
 }

@@ -14,26 +14,31 @@ Description: In many academic papers, table 1 shows participant
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
+Depends: R (>= 3.5.0)
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))
 RoxygenNote: 6.1.1
 Imports:
     tibble,
+    knitr, 
+    officer,
+    flextable,
+    kableExtra,
     forcats,
-    mitml,
+    labelled,
+    tidyr,
+    tidyselect,
+    stringr,
+    mitml, 
     rlang,
     vctrs,
-    tidyr,
     purrr,
-    tidyselect,
-    formula.tools,
     geepack,
-    stats,
     glue,
+    stats,
     magrittr,
-    dplyr, 
-    flextable, 
-    kableExtra, 
-    knitr, 
-    labelled, 
-    officer,
-    stringr
+    dplyr
+VignetteBuilder: knitr
+Suggests: 
+    rmarkdown,
+    survival,
+    tidyverse

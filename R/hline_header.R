@@ -4,7 +4,6 @@
 #' @param border border defined by a call to fp_border
 #' @param bottom T/F, should bottom border of the header be changed?
 #'
-#' @export
 #'
 
 hline_header <- function(x, border = NULL, bottom=F) {

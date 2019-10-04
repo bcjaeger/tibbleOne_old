@@ -2,13 +2,16 @@
 % Please edit documentation in R/parse_flex_footers.R
 \name{parse_flex_footers}
 \alias{parse_flex_footers}
-\title{determine which type of symbols to use for flextable footnotes}
+\title{flextable footers}
 \usage{
 parse_flex_footers(footnote_notation)
 }
 \arguments{
-\item{footnote_notation}{character value indicating footnote symbols to use in tables. Eligible values are \code{symbol}, \code{number}, and \code{alphabet}.}
+\item{footnote_notation}{character value indicating footnote
+symbols to use in tables. Eligible values are \code{symbol},
+\code{number}, and \code{alphabet}.}
 }
 \description{
-determine which type of symbols to use for flextable footnotes
+determine which type of symbols to use
+for flextable footnotes
 }

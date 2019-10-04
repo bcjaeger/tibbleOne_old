@@ -6,6 +6,9 @@
 \usage{
 list_things(things)
 }
+\arguments{
+\item{things}{vector containing things to list}
+}
 \description{
 easy lists of things
 }

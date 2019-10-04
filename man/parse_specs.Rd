@@ -15,8 +15,6 @@ Only variables that are in the user-specified formula for
 \item{specs_analyst}{named vector of character values.
 Names should be variables, while values should be specs
 (e.g., \code{mean}, \code{median} for values, and \code{params} or \code{noparm} for tests).}
-
-\item{type}{character value, should be numeric, integer, or factor}
 }
 \description{
 specificy table values/tests

@@ -2,89 +2,67 @@
 
 #' make a tidy data frame with table one information
 #' @param data a data frame
-#' @param meta_data a meta data frame. If unspecified, a meta data frame will be created using `data`.
-#' @param formula an optional formula object. The left hand side of the formula should be blank. The right hand side of the formula should contain row variables for the table. The '|' symbol can be used to include stratifying variables. If this option is used, no more than two stratifying variables should be used, and they must be separated by a * symbol. If formula is used, the strat, by, and row_vars inputs are ignored.
-#' @param strat a character value indicating the column name in data that will be used to stratify the table
-#' @param by a character value indicating the column name in data that will be used to split the table into groups, prior to stratification.
-#' @param row_vars a character vector indicating column names of row variables in the table. If unspecified, all columns are used.
-#' @param include_pval T/F, should the table include a column for p-values? If p-values are included, factor variables are handled using chi-square tests, continuous variables are handled using t-tests or ANOVA, depending on the number of categories in the table stratification.
-#' @param expand_binary_catgs T/F, should all categories be included for binary categorical variables? (This only applies to binary variables.)
-#' @param include_freq T/F, should frequency values be included for categorical variables?
-#' @param include_miss_info T/F, should the table include information on percent of missing values?
+#'
+#' @param meta_data a meta data frame. If unspecified, a meta data frame
+#'   will be created using `data`.
+#'
+#' @param formula an optional formula object. The left hand side of the
+#'   formula should be blank. The right hand side of the formula should
+#'   contain row variables for the table. The '|' symbol can be used to
+#'   include stratifying variables. If this option is used, no more than
+#'   two stratifying variables should be used, and they must be separated
+#'    by a * symbol. If formula is used, the strat, by, and row_vars inputs
+#'    are ignored.
+#'
+#' @param strat a character value indicating the column name in data that
+#'   will be used to stratify the table
+#'
+#' @param by a character value indicating the column name in data that
+#'   will be used to split the table into groups, prior to stratification.
+#'
+#' @param row_vars a character vector indicating column names of row
+#'   variables in the table. If unspecified, all columns are used.
+#'
+#' @param specs_table_vals named vector of character values.
+#'   Names should be variables, while values should be specs.
+#'   Valid specs are 'mean' and 'median' (see examples).
+#'
+#' @param specs_table_tests named vector of character values.
+#'   Names should be variables, while values should be specs.
+#'   Valid specs are 'params' or 'noparm' (see examples).
+#'
+#' @param include_pval T/F, should the table include a column for p-values?
+#'   If p-values are included, factor variables are handled using
+#'   chi-square tests, continuous variables are handled using t-tests
+#'   or ANOVA, depending on the number of categories in the table
+#'   stratification.
+#'
+#' @param expand_binary_catgs T/F, should all categories be included for
+#'   binary categorical variables? (This only applies to binary variables.)
+#'
+#' @param include_freq T/F, should frequency values be included for
+#'   categorical variables?
+#'
+#' @param include_miss_info T/F, should the table include information
+#'   on percent of missing values?
+#'
 #' @export
+#'
 #' @examples
-#' library(labelled)
-#' library(dplyr)
-#' library(forcats)
-#' library(survival)
-#' library(kableExtra)
-#' library(flextable)
-#' library(tibbleOne)
+#' data("pbc_tbl1")
+#' # report median albumin instead of mean
+#' # use kruskal wallis test for albumin
+#' tibble_one(
+#'   pbc_tbl1,
+#'   formula = ~ . | trt,
+#'   include_freq = FALSE,
+#'   include_pval = TRUE,
+#'   specs_table_vals = c(albumin = 'median'),
+#'   specs_table_tests = c(albumin = 'nopars')
+#' )
 #'
-#' data = pbc %>%
-#'   dplyr::select(
-#'     age, sex, status, trt, stage, ascites, bili, edema, albumin
-#'   ) %>%
-#'   dplyr::mutate(
-#'     status=factor(
-#'       status, levels = c(0:2),
-#'       labels = c("Censored", "Transplant", "Dead")
-#'     ),
-#'     stage = factor(
-#'       stage, levels = c(1:4),
-#'       labels = c("One", "Two", "Three", "Four")
-#'     ),
-#'     trt=factor(
-#'       trt, levels=c(1:2),
-#'       labels = c("Drug A", "Drug B")
-#'     ),
-#'     ascites=factor(
-#'       ascites, levels=c(0:1),
-#'       labels = c("No", "Yes")
-#'     ),
-#'     sex = fct_recode(
-#'       sex,
-#'       'Male'='m',
-#'       'Female'='f'
-#'     ),
-#'     edema = factor(
-#'       edema,
-#'       levels=c(0, 0.5, 1),
-#'       labels=c("None", "A little", "Lots")
-#'     )
-#'   ) %>%
-#'   set_variable_labels(
-#'     status = "Status at last contact",
-#'     trt = "Treatment group",
-#'     age = 'Age, years',
-#'     sex = 'Sex at birth',
-#'     ascites = 'Ascites',
-#'     bili = 'Bilirubin levels, mg/dl',
-#'     edema = 'Is there Edema?'
-#'   ) %>%
-#'   set_variable_groups(
-#'     Outcomes = c('status'),
-#'     Exposures = c('ascites','bili','edema','trt','albumin','stage')
-#'   )
-#'
-#' tbl_one = data %>%
-#'   tibble_one(
-#'     formula = ~ . | trt,
-#'     include_freq = FALSE,
-#'     include_pval = TRUE
-#'   )
-#'
-#' tbl_one %>%
-#'   to_kable(format = 'html') %>%
-#'   kable_styling(
-#'     position = 'center',
-#'     bootstrap_options = c('striped')
-#'   )
-#'
-#' tbl_one %>%
-#'   to_word(use.groups = FALSE)
 
-# data = data
+# data = pbc_tbl1
 # formula = ~ . - age | sex
 # meta_data = NULL
 # strat = NULL
@@ -99,11 +77,11 @@
 
 tibble_one <- function(
   data,
+  meta_data = NULL,
   formula = NULL,
   row_vars = NULL,
   strat = NULL,
   by = NULL,
-  meta_data = NULL,
   specs_table_vals = NULL,
   specs_table_tests = NULL,
   expand_binary_catgs = FALSE,
@@ -160,7 +138,6 @@ tibble_one <- function(
     )
   }
 
-
   # Ordered factors need to be re-factored as unordered.
   # (This has to do with the default contrast method in R)
 
@@ -179,11 +156,11 @@ tibble_one <- function(
 
   }
 
-
   # meta data set is compiled if needed
-  mta_data <- meta_data %||%
-    build_meta(data, expand_binary_catgs) %>%
-    dplyr::filter(variable %in% c(strat, by, row_vars)) %>%
+  meta <- meta_data %||% build_meta(data, expand_binary_catgs)
+
+  meta$data %<>%
+    filter(variable %in% c(strat, by, row_vars)) %>%
     check_meta()
 
   # initialize default specification for table values / tests
@@ -250,7 +227,14 @@ tibble_one <- function(
     # if strat is specified, we know there is at least
     # one level of stratification. Therefore, we
     # identify the label of the stratification variable
-    strat_labs <- get_label(data, strat)
+
+    if(strat %in% meta$data$variable){
+      strat_labs <- meta$data %>%
+        filter(variable == strat) %>%
+        pull(label)
+    } else {
+      strat_labs <- capitalize(strat)
+    }
 
     # We also specify that there is one by group and
     # and initialize by_table, which we will modify if there
@@ -263,7 +247,16 @@ tibble_one <- function(
       # For this type of table, two headers are needed.
       # To set this up, we modify the strat variable in data and
       # designate the number of participants in each by category
-      strat_labs %<>% c(get_label(data, by))
+
+      if(by %in% meta$data$variable){
+        by_lab <- meta$data %>%
+          filter(variable == by) %>%
+          pull(label)
+        strat_labs <- c(strat_labs, by_lab)
+      } else {
+        strat_labs <- c(strat_labs, capitalize(by))
+      }
+
       by_table <- table(data[[by]])
       n_by <- length(by_table)
       data[[strat]] %<>% interaction(data[[by]], sep='_._')
@@ -305,10 +298,10 @@ tibble_one <- function(
 
   # the original data is modified for computing table values
   # .strat is the stratifying variable
-  tbl_data = dplyr::select(data, !!!select_vec)
+  tbl_data = select(data, !!!select_vec)
 
   # abbreviations are organized into one string
-  table_abbrs <- mta_data$abbr %>%
+  table_abbrs <- meta$data$abbr %>%
     purrr::keep(~any(!is.na(.x))) %>%
     purrr::flatten() %>%
     purrr::map2_chr(names(.), ~ paste(.y, .x, sep = ' = ')) %>%
@@ -316,11 +309,11 @@ tibble_one <- function(
     paste(collapse = ', ')
 
   # notes are left as a named list
-  table_notes <- mta_data$note %>%
-    set_names(mta_data$variable) %>%
+  table_notes <- meta$data$note %>%
+    set_names(meta$data$variable) %>%
     purrr::keep(~any(!is.na(.x)))
 
-  table_data <- mta_data %>%
+  table_data <- meta$data %>%
     select(-c(abbr,note)) %>%
     {
       if(stratified_table){
@@ -363,11 +356,11 @@ tibble_one <- function(
         }
       )
     ) %>%
-    dplyr::select(
+    select(
       variable, unit, labels, tbl_val, group
     ) %>%
     tidyr::unnest(cols = c(labels, tbl_val)) %>%
-    dplyr::bind_rows(descr_row, .) %>%
+    bind_rows(descr_row, .) %>%
     mutate(
       variable = factor(
         x = variable,
@@ -375,9 +368,9 @@ tibble_one <- function(
           'descr',
           unique(
             c(
-              setdiff(row_vars, attr(tbl_data, "var_levels", exact = T)),
+              setdiff(row_vars, meta$var_levels),
               # order for variables without group assignment
-              attr(tbl_data, "var_levels", exact = T),
+              meta$var_levels,
               # Order for variables with group assignment
               row_vars
             )
@@ -389,7 +382,7 @@ tibble_one <- function(
         levels = unique(
           c(
             "None",
-            attr(tbl_data, "group_levels", exact = T)
+            meta$group_levels
           )
         )
       ),
@@ -398,8 +391,8 @@ tibble_one <- function(
         TRUE ~ labels
       )
     ) %>%
-    dplyr::arrange(group, variable) %>%
-    dplyr::select(-unit)
+    arrange(group, variable) %>%
+    select(-unit)
 
   # Set table attributes
 

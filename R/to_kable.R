@@ -1,14 +1,26 @@
 
 #' pass a tibble_one object into kable
+#'
 #' @param object a tibble_one object
-#' @param ... arguments passed to kable function
-#' @param format character, format for printing
+#'
 #' @param use_groups T/F, should rows be grouped?
-#' @param indent_groups T/F, should entries within groups be indented? (this has no effect if `use_groups` is `FALSE`)
-#' @param footnote_notation character value indicating footnote symbols to use in tables. Eligible values are `symbol`, `number`, and `alphabet`.
+#'
+#' @param indent_groups T/F, should entries within groups be indented?
+#'   (this has no effect if `use_groups` is `FALSE`)
+#'
+#' @param footnote_notation character value indicating footnote symbols to
+#'   use in tables. Eligible values are `symbol`, `number`, and `alphabet`.
+#'
 #' @param include_1st_header T/F, should bottom header be included?
+#'
 #' @param include_2nd_header T/F, should middle header be included?
+#'
 #' @param include_3rd_header T/F, should top header be included?
+#'
+#' @param bold_headers T/F, should header labels be printed in bold?
+#'
+#' @inheritDotParams knitr::kable format caption label
+#'
 #' @export
 #'
 
@@ -25,19 +37,34 @@
 
 to_kable <- function(
   object,
-  format=NULL,
   use_groups=TRUE,
   indent_groups = FALSE,
   footnote_notation = 'symbol',
   include_1st_header = TRUE,
   include_2nd_header = TRUE,
   include_3rd_header = TRUE,
-  escape = TRUE,
   bold_headers = TRUE,
   ...
 ){
 
   check_tibble_one_input(object)
+
+  .dots <- list(...) %>%
+    check_dots(
+      valid_args = c(
+        'format',
+        'caption',
+        'label'
+      )
+    )
+
+  escape <- .dots$escape <- FALSE
+
+  if('format' %nin% names(.dots)){
+    format = getOption("knitr.table.format")
+  } else {
+    format = .dots$format
+  }
 
   by <- attr(object, 'byvar')
   strat_data <- attr(object, 'strat')
@@ -49,15 +76,12 @@ to_kable <- function(
   expand_binary_catgs <- attr(object, 'allcats')
   table_value_description <- attr(object, 'descr')
 
-  if (is.null(format))
-    format = getOption("knitr.table.format")
-
-  if (all(object$group == 'None')) {
+  if (all(na.omit(object$group == 'None'))) {
     use_groups = FALSE
   }
 
   if(!use_groups){
-    object %<>% dplyr::arrange(variable)
+    object %<>% arrange(variable)
   }
 
   if (include.pval & format == 'latex') {
@@ -86,13 +110,13 @@ to_kable <- function(
     format = format
   )
 
-  k1 <- dplyr::mutate_if(object, is.factor, as.character)
+  k1 <- mutate_if(object, is.factor, as.character)
 
   footnote_marker_fun <- switch(
     EXPR = footnote_notation,
-    'symbol' = kableExtra::footnote_marker_symbol,
-    'number' = kableExtra::footnote_marker_number,
-    'alphabet' = kableExtra::footnote_marker_alphabet
+    'symbol' = footnote_marker_symbol,
+    'number' = footnote_marker_number,
+    'alphabet' = footnote_marker_alphabet
   )
 
   # place footnote symbols in table rows
@@ -132,16 +156,16 @@ to_kable <- function(
   if(format == 'html'){
 
     n_obs <- k1 %>%
-      dplyr::filter(labels == 'No. of observations') %>%
-      dplyr::select(-c(group, variable, labels)) %>%
-      tidyr::gather() %>%
+      filter(labels == 'No. of observations') %>%
+      select(-c(group, variable, labels)) %>%
+      gather() %>%
       mutate(
         value = case_when(
           value != "" ~ paste0(key, '<br/>', '(N = ',value,')'),
           TRUE ~ value
         )
       ) %>%
-      dplyr::select(value, key) %>%
+      select(value, key) %>%
       tibble::deframe()
 
     if(names_need_repairing){
@@ -156,47 +180,44 @@ to_kable <- function(
     }
 
     k1 %<>%
-      dplyr::filter(labels != 'No. of observations') %>%
-      dplyr::select(` ` = labels, !!n_obs)
+      filter(labels != 'No. of observations') %>%
+      select(` ` = labels, !!n_obs)
 
     # need to filter original data for consistency
     object %<>%
-      dplyr::filter(labels != 'No. of observations')
+      filter(labels != 'No. of observations')
 
   } else if(format == 'latex'){
 
     # remove group/variable columns
     # rename remaining columns for printing
     k1 %<>%
-      dplyr::select(
+      select(
         ` ` = labels,
-        dplyr::everything(),
+        everything(),
         -c(group, variable)
       )
 
     if(names_need_repairing){
-      k1 %<>% dplyr::rename(!!!names_to_repair)
+      k1 %<>% rename(!!!names_to_repair)
     }
 
   }
 
-  k1 %<>%
-    knitr::kable(
-      align = c("l",rep("c",ncol(.)-1)),
-      escape = escape,
-      format = format,
-      ...
-    ) %>%
-    kableExtra::add_indent(
+  .dots$align <- c("l",rep("c",ncol(k1)-1))
+  .dots$x <- k1
+
+  output <- do.call(kable, args = .dots) %>%
+    add_indent(
       positions = find_indent_rows(object$variable)
     ) %>%
-    kableExtra::add_footnote(
+    add_footnote(
       label = c(table_value_description, table_notes),
       threeparttable = TRUE,
       escape = escape,
       notation = footnote_notation
     ) %>%
-    kableExtra::add_footnote(
+    add_footnote(
       label = table_abbrs,
       escape = escape,
       notation = 'none'
@@ -213,8 +234,8 @@ to_kable <- function(
         x = .
       )
 
-    k1 %<>%
-      kableExtra::group_rows(
+    output %<>%
+      group_rows(
         index = grp_tbl,
         latex_gap_space = "0.5em",
         hline_after = TRUE,
@@ -226,7 +247,7 @@ to_kable <- function(
 
   if(include_1st_header){
 
-    k1 %<>% add_kable_header(
+    output %<>% add_kable_header(
       escape = escape,
       bold = bold_headers,
       header = k1_decor$header
@@ -237,7 +258,7 @@ to_kable <- function(
   if(include_2nd_header){
 
     if(!is.null(k1_decor$midder)){
-      k1 %<>% add_kable_header(
+      output %<>% add_kable_header(
         escape = escape,
         bold = bold_headers,
         header = k1_decor$midder
@@ -249,7 +270,7 @@ to_kable <- function(
   if(include_3rd_header){
 
     if(!is.null(k1_decor$topper)){
-      k1 %<>% add_kable_header(
+      output %<>% add_kable_header(
         escape = escape,
         bold = bold_headers,
         header = k1_decor$topper
@@ -258,6 +279,6 @@ to_kable <- function(
 
   }
 
-  k1
+  output
 
 }

@@ -9,7 +9,6 @@
 #' @param specs_analyst named vector of character values.
 #'   Names should be variables, while values should be specs
 #'   (e.g., `mean`, `median` for values, and `params` or `noparm` for tests).
-#' @param type character value, should be numeric, integer, or factor
 #'
 
 parse_specs <- function(specs_default, specs_analyst){

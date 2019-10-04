@@ -5,6 +5,7 @@ is_two_sided <- function(formula){
 }
 
 #' easy lists of things
+#' @param things vector containing things to list
 list_things <- function(things){
 
   glue_collapse(things, sep = ', ', last = ' and ')
@@ -52,34 +53,34 @@ check_row_vars <- function(string){
 }
 
 
-#' tibbleOne formula handler
-#'
-#' @description [tibble_one()] accepts formula input.
-#'   This function translates a formula input value into three
-#'   types of table one variables (e.g., row, stratification, and by).
-#'   It is unlikely that you will want to use this function directly,
-#'   but may wish to use it to debug a formula object that is not
-#'   providing the tibble one results you were expecting.
-#'
-#' @param formula a one sided `formula` object with row variables
-#'   to the left and stratification variables to the right of a
-#'   | symbol. For example, formula = ~ x + y | z.
-#' @param data a data frame to evaluate formula terms in.
-#'
-#' @examples
-#'
-#' df = data.frame(a = 1, b = 2, c = 3)
-#'
-#' get_tb1_vars(~ a + b | c, df)
-#'
-#' # identical to
-#'
-#' get_tb1_vars(~ . | c, df)
-#'
-#' # specify a by variable using *
-#'
-#' get_tb1_vars(~ . | b*c, df)
-#'
+# tibbleOne formula handler
+#
+# @description [tibble_one()] accepts formula input.
+#   This function translates a formula input value into three
+#   types of table one variables (e.g., row, stratification, and by).
+#   It is unlikely that you will want to use this function directly,
+#   but may wish to use it to debug a formula object that is not
+#   providing the tibble one results you were expecting.
+#
+# @param formula a one sided `formula` object with row variables
+#   to the left and stratification variables to the right of a
+#   | symbol. For example, formula = ~ x + y | z.
+# @param data a data frame to evaluate formula terms in.
+#
+# @examples
+#
+# df = data.frame(a = 1, b = 2, c = 3)
+#
+# get_tb1_vars(~ a + b | c, df)
+#
+# # identical to
+#
+# get_tb1_vars(~ . | c, df)
+#
+# # specify a by variable using *
+#
+# get_tb1_vars(~ . | b*c, df)
+#
 
 parse_tb1_formula <- function(formula, data){
 

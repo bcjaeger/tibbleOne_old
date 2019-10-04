@@ -4,21 +4,21 @@
 \alias{to_kable}
 \title{pass a tibble_one object into kable}
 \usage{
-to_kable(object, format = NULL, use_groups = TRUE,
-  indent_groups = FALSE, footnote_notation = "symbol",
-  include_1st_header = TRUE, include_2nd_header = TRUE,
-  include_3rd_header = TRUE, escape = TRUE, bold_headers = TRUE, ...)
+to_kable(object, use_groups = TRUE, indent_groups = FALSE,
+  footnote_notation = "symbol", include_1st_header = TRUE,
+  include_2nd_header = TRUE, include_3rd_header = TRUE,
+  bold_headers = TRUE, ...)
 }
 \arguments{
 \item{object}{a tibble_one object}
 
-\item{format}{character, format for printing}
-
 \item{use_groups}{T/F, should rows be grouped?}
 
-\item{indent_groups}{T/F, should entries within groups be indented? (this has no effect if \code{use_groups} is \code{FALSE})}
+\item{indent_groups}{T/F, should entries within groups be indented?
+(this has no effect if \code{use_groups} is \code{FALSE})}
 
-\item{footnote_notation}{character value indicating footnote symbols to use in tables. Eligible values are \code{symbol}, \code{number}, and \code{alphabet}.}
+\item{footnote_notation}{character value indicating footnote symbols to
+use in tables. Eligible values are \code{symbol}, \code{number}, and \code{alphabet}.}
 
 \item{include_1st_header}{T/F, should bottom header be included?}
 
@@ -26,7 +26,19 @@ to_kable(object, format = NULL, use_groups = TRUE,
 
 \item{include_3rd_header}{T/F, should top header be included?}
 
-\item{...}{arguments passed to kable function}
+\item{bold_headers}{T/F, should header labels be printed in bold?}
+
+\item{...}{Arguments passed on to \code{knitr::kable}
+\describe{
+  \item{format}{A character string. Possible values are \code{latex},
+\code{html}, \code{markdown}, \code{pandoc}, and \code{rst}; this will be
+automatically determined if the function is called within \pkg{knitr}; it
+can also be set in the global option \code{knitr.table.format}. If
+\code{format} is a function, it must return a character string.}
+  \item{caption}{The table caption.}
+  \item{label}{The table reference label. By default, the label is obtained
+from \code{knitr::\link{opts_current}$get('label')}.}
+}}
 }
 \description{
 pass a tibble_one object into kable

@@ -1,29 +1,4 @@
 
-#' add footers to a flextable tibbleOne object
-#' @export
-
-# ft_object = ft1_object %>%
-#   flextable::theme_box() %>%
-#   flextable::align(
-#     align = 'center',
-#     part = 'all'
-#   ) %>%
-#   flextable::align(
-#     j = 1,
-#     align = 'left',
-#     part = 'all'
-#   ) %>%
-#   flextable::padding(
-#     i = one_bump,
-#     j = 1,
-#     padding.left = pad_one
-#   ) %>%
-#   flextable::padding(
-#     i = two_bump,
-#     j = 1,
-#     padding.left = pad_two
-#   )
-
 add_ft_footers <- function(
   ft_object,
   num_headers,

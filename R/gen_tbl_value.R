@@ -1,20 +1,4 @@
 
-#' generate table one values for a column variable
-#' @inheritParams tibble_one
-#' @param variable character value, column name of the variable
-#' @param type character value, should be numeric, integer, or factor
-#' @export
-
-
-# data = tbl_data
-# variable = 'bili'
-# var_type = 'numeric'
-# fun_type = 'mean'
-# test_type = 'param'
-# include_pval = include_pval
-# include_freq = include_freq
-# stratified_table = stratified_table
-# expand_binary_catgs = expand_binary_catgs
 
 gen_tbl_value <- function(
   data,
@@ -81,18 +65,6 @@ gen_tbl_value <- function(
 }
 
 
-#' generate mean and standard deviation values for a continuous variable
-#' @param variable character value, column name of the variable
-#' @param data a data frame
-#' @param stratified_table T/F, should table values be stratified?
-#' @param include_pval T/F, should the table include a column for p-values?
-#' @param include.missinf T/F, should the table include information on percent of missing values?
-#' @export
-#' @importFrom stats 'anova' 't.test' 'lm' 'as.formula'
-#' @importFrom magrittr 'use_series'
-
-# ctns_fun <- mean_sd
-
 ctns_tbl_value <- function(
   data,
   variable,
@@ -101,8 +73,6 @@ ctns_tbl_value <- function(
   stratified_table,
   include_pval
 ){
-
-  .=NULL
 
   vals_overall = ctns_fun(data[[variable]])
 
@@ -138,11 +108,6 @@ ctns_tbl_value <- function(
 
 }
 
-#' compute median and specified percentiles of continuous variable
-#' @param variable numeric vector.
-#' @export
-#' @importFrom stats 'quantile'
-
 median_iqr <- function(variable){
 
   vals <- quantile(variable, probs = c(0.25, 0.50, 0.75), na.rm = TRUE)
@@ -156,11 +121,6 @@ median_iqr <- function(variable){
 }
 
 
-#' compute mean and standard deviation of continuous variable
-#' @param variable numeric vector
-#' @export
-#' @importFrom stats 'sd'
-
 mean_sd<-function(variable){
 
   paste0(
@@ -170,61 +130,45 @@ mean_sd<-function(variable){
 
 }
 
-#' compute p-values for parametric tests
-
 cmp_pval_params <- function(data, variable, ngrps) {
 
   if( ngrps == 2 ){
 
-    stats::t.test(data[[variable]] ~ data[['.strat']]) %>%
+    t.test(data[[variable]] ~ data[['.strat']]) %>%
       use_series("p.value") %>%
       edit_pval()
 
   } else {
 
-    stats::as.formula(paste(variable,'~ .strat'))%>%
-      stats::lm(data=data) %>%
-      stats::anova() %>%
+    as.formula(paste(variable,'~ .strat'))%>%
+      lm(data=data) %>%
+      anova() %>%
       .[1,ncol(.)] %>%
       edit_pval()
 
   }
 }
 
-#' compute p-values from non-parametric tests
 
 cmp_pval_noparm <- function(data, variable, ngrps){
 
   if( ngrps == 2 ){
 
-    stats::wilcox.test(data[[variable]] ~ data[['.strat']]) %>%
+    wilcox.test(data[[variable]] ~ data[['.strat']]) %>%
       magrittr::use_series("p.value") %>%
       edit_pval()
 
   } else {
 
     paste(variable,'~ .strat') %>%
-      stats::as.formula()%>%
-      stats::kruskal.test(data=data) %>%
-      magrittr::use_series("p.value") %>%
+      as.formula()%>%
+      kruskal.test(data=data) %>%
+      use_series("p.value") %>%
       edit_pval()
 
   }
 
 }
-
-#' generate table values for a categorical variable
-#' @param variable character value, column name of the variable
-#' @param data a data frame
-#' @param stratified_table T/F, should table values be stratified?
-#' @param include_pval T/F, should the table include a column for p-values?
-#' @param include_freq T/F, should frequency values be included for categorical variables?
-#' @param expand_binary_catgs T/F, should all categories be included for categorical variables?
-#' @param include.missinf T/F, should the table include information on percent of missing values?
-#' @export
-#' @importFrom stats 'chisq.test'
-#' @importFrom magrittr 'set_colnames' 'set_rownames' '%<>%' '%>%'
-#' @importFrom tibble 'as_tibble'
 
 catg_tbl_value <- function(
   variable,
@@ -235,8 +179,6 @@ catg_tbl_value <- function(
   expand_binary_catgs=FALSE,
   include.missinf=FALSE
 ){
-
-  . = NULL
 
   counts_overall = table(data[[variable]])
   propts_overall = adapt_round(100*prop.table(counts_overall))
@@ -324,9 +266,15 @@ catg_tbl_value <- function(
 
     blanks <- rep("", n_reps)
 
-    pval = stats::chisq.test(counts_by_group)$p.value %>%
-      edit_pval() %>%
-      c(blanks) %>%
+    chi_tst <- suppressWarnings(try(chisq.test(counts_by_group)))
+
+    if(class(chi_tst)[1]=='try-error'){
+      pval = 'NA'
+    } else {
+      pval = edit_pval(chi_tst$p.value)
+    }
+
+    pval <- c(pval, blanks) %>%
       matrix(ncol=1) %>%
       set_colnames('P-value')
 
@@ -363,7 +311,7 @@ catg_tbl_value <- function(
         cells_by_group
       ) %>%
         tibble::as_tibble() %>%
-        dplyr::mutate(
+        mutate(
           label=rownames(cells_overall)
         )
 
@@ -386,7 +334,7 @@ catg_tbl_value <- function(
         cells_overall
       ) %>%
         tibble::as_tibble() %>%
-        dplyr::mutate(
+        mutate(
           label=rownames(cells_overall)
         )
 

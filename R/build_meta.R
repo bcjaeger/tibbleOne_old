@@ -1,12 +1,18 @@
 
 #' creates a dataset that describes the characteristics of another dataset
-#' @param data a data frame with any combination of the following attributes: `label`, `unit`, `group`, `abbrs`, and `notes`. Columns in the meta data are based on these attributes.
+#' @param data a data frame with any combination of the following
+#'   attributes: `label`, `unit`, `group`, `abbrs`, and `notes`.
+#'   Columns in the meta data are based on these attributes.
+#'
+#' @param expand_binary_catgs T/F, should all categories be included for
+#'   binary categorical variables? (This only applies to binary variables.)
+#'
+#' @param max_catgs largest number of categories accepted in a factor
+#'   variable. A warning message is printed if a factor variable
+#'   has more categories than `max_catg`.
+#'
 #' @export
-#' @param expand_binary_catgs T/F, should all categories be included for binary categorical variables? (This only applies to binary variables.)
-#' @importFrom purrr 'map_chr' 'map_int' 'map' 'pmap'
-#' @importFrom tibble 'tibble'
-#' @importFrom dplyr 'select'
-#' @importFrom glue glue_collapse
+
 
 build_meta <- function(
   data,
@@ -19,14 +25,14 @@ build_meta <- function(
 
   mta_data <- tibble::tibble(
     variable = names(data),
-    type     = purrr::map_chr(data, class),
-    n_unique = purrr::map_int(data, ~length(unique(na.omit(.x)))),
-    label    = purrr::map_chr(variable, ~get_label(data, .x)),
-    unit     = purrr::map_chr(variable, ~get_units(data, .x)),
-    group    = purrr::map_chr(variable, ~get_groups(data, .x)),
-    abbr     = purrr::map(variable, ~get_abbrs(data, .x)),
-    note     = purrr::map(variable, ~get_notes(data, .x)),
-    labels   = purrr::pmap(
+    type     = map_chr(data, class),
+    n_unique = map_int(data, ~length(unique(na.omit(.x)))),
+    label    = map_chr(variable, ~get_label(data, .x)),
+    unit     = map_chr(variable, ~get_units(data, .x)),
+    group    = map_chr(variable, ~get_groups(data, .x)),
+    abbr     = map(variable, ~get_abbrs(data, .x)),
+    note     = map(variable, ~get_notes(data, .x)),
+    labels   = pmap(
       list(
         variable,
         type,
@@ -69,7 +75,7 @@ build_meta <- function(
       }
     )
   ) %>%
-    dplyr::select(
+    select(
       variable, label, type, unit, group, abbr, note, labels
     )
 
@@ -93,34 +99,16 @@ build_meta <- function(
 
   }
 
-  mta_data
+  output <- structure(
+    .Data = list(
+      data = mta_data,
+      group_levels = attr(data, 'group_levels'),
+      var_levels = attr(data, 'var_levels')
+    ),
+    class = 'meta'
+  )
+
+  output
 
 }
-
-check_meta <- function(meta){
-
-  # check variable types in meta data
-  if( !all(meta$type %in% c('factor', 'numeric', 'integer')) ) {
-
-    out_variables <- meta %>%
-      dplyr::filter(!type %in% c('factor', 'numeric', 'integer')) %>%
-      mutate(variable = paste0(variable, ' (',type,')')) %>%
-      purrr::pluck('variable') %>%
-      paste(collapse = ' -- ')
-
-    out_msg <- paste(
-      "tibble_one is compatible with factor, numeric, and integer variables.",
-      "Please inspect the following variables in your input data:",
-      out_variables,
-      sep= '\n'
-    )
-
-    stop(out_msg, call. = FALSE)
-
-  }
-
-  meta
-
-}
-
 

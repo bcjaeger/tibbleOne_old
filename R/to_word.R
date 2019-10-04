@@ -13,8 +13,8 @@
 #' @param ... arguments passed to flextable function
 #' @export
 
-# object = tbl_one
-# use_groups = FALSE
+# object = tb1
+# use_groups = TRUE
 # indent_groups = TRUE
 # font_size = 11
 # footnote_notation = 'symbol'
@@ -125,9 +125,6 @@ to_word <- function(
   }
 
   # format column names to have n=yy on the bottom
-  # this only works for html / word tables.
-  # (Doesn't work for LaTex tables)
-
   n_obs <- ft1_data %>%
     filter(labels == 'No. of observations') %>%
     select(-c(group, variable, labels)) %>%
@@ -143,22 +140,46 @@ to_word <- function(
     {if(use_groups) c('group', .) else {.}}
 
 
+  # filter out nobs row and select/rename columns
+  # to implement the name repair work done above
+  ft1_data %<>%
+    filter(labels != 'No. of observations') %>%
+    rename(Characteristic = labels) %>%
+    select_at(.vars = c("Characteristic", set_names(n_obs, NULL)))
+
+  # collect labels for table columns
+  # this only matters when table is double decker
+  header_labels <- names(n_obs) %>%
+    set_names(n_obs)
+
+  if("P-value" %in% names(header_labels)){
+    header_labels["P-value"] <- "P-value"
+  }
+
+  if('group' %in% names(header_labels)){
+    header_labels <- header_labels[-which(names(header_labels)=='group')]
+  }
+
   if(names_need_repairing){
     for(i in 1:length(names_to_repair)){
+
       names(n_obs) <- gsub(
         pattern = names_to_repair[i],
         replacement = repaired_names[i],
         x = names(n_obs),
         fixed = TRUE
       )
+
+      header_labels <- gsub(
+        pattern = names_to_repair[i],
+        replacement = repaired_names[i],
+        x = header_labels,
+        fixed = TRUE
+      )
+
     }
   }
 
-  # filter out nobs row and select/rename columns
-  # to implement the name repair work done above
-  ft1_data %<>%
-    filter(labels != 'No. of observations') %>%
-    select(Characteristic = labels, !!!n_obs)
 
   # Filter original data to match table one data
   object %<>%
@@ -171,17 +192,17 @@ to_word <- function(
     # artificial group row that flextable adds in
     # for the "None" group.
     ft1_data %<>%
-      flextable::as_grouped_data(groups = 'group') %>%
+      as_grouped_data(groups = 'group') %>%
       .[is.na(.[['group']]) | .[['group']] != 'None', ]
 
     # initialize the flextable object and set
     # group rows to write just the label of the group
-    ft1_object <- flextable::as_flextable(ft1_data) %>%
-      flextable::compose(
+    ft1_object <- as_flextable(ft1_data) %>%
+      compose(
         i = ~ !is.na(group),
         j = 1,
-        value = flextable::as_paragraph(
-          flextable::as_chunk(group)
+        value = as_paragraph(
+          as_chunk(group)
         )
       )
 
@@ -232,7 +253,7 @@ to_word <- function(
     # If we aren't grouping variables into bundled rows,
     # this step becomes a whole lot simpler.
     first_indent <- NULL
-    ft1_object <- flextable::flextable(ft1_data)
+    ft1_object <- flextable(ft1_data)
 
   }
 
@@ -281,16 +302,19 @@ to_word <- function(
   pad_one <- if(use_groups && indent_groups) 15 else 5
   pad_two <- pad_one + 15
 
+  header_labels <- c(Characteristic = 'Characteristic', header_labels)
+
   # Return flextable object with a few formatting changes
   # to make a relatively clean looking table one
   ft1_object %>%
-    flextable::theme_box() %>%
-    flextable::padding(
+    set_header_labels(values = header_labels) %>%
+    theme_box() %>%
+    padding(
       i = one_bump,
       j = 1,
       padding.left = pad_one
     ) %>%
-    flextable::padding(
+    padding(
       i = two_bump,
       j = 1,
       padding.left = pad_two
@@ -303,9 +327,9 @@ to_word <- function(
       table_notes = table_notes,
       table_abbrs = table_abbrs
     ) %>%
-    flextable::fontsize(size = font_size, part = 'all') %>%
-    flextable::align(align = 'center', part = 'all') %>%
-    flextable::align(j = 1, align = 'left', part = 'all')
+    fontsize(size = font_size, part = 'all') %>%
+    align(align = 'center', part = 'all') %>%
+    align(j = 1, align = 'left', part = 'all')
 
 }
 
@@ -317,36 +341,36 @@ to_word <- function(
 #   odd <- !even
 #
 #   out %>%
-#     flextable::theme_box() %>%
-#     flextable::border_remove() %>%
+#     theme_box() %>%
+#     border_remove() %>%
 #     # Border line for header
-#     flextable::hline_top(part = "header", border = officer::fp_border(width = 3)) %>%
-#     flextable::hline_bottom(part="header", border = officer::fp_border(width = 3)) %>%
-#     flextable::hline_bottom(part="body", border = officer::fp_border(width = 3)) %>%
+#     hline_top(part = "header", border = officer::fp_border(width = 3)) %>%
+#     hline_bottom(part="header", border = officer::fp_border(width = 3)) %>%
+#     hline_bottom(part="body", border = officer::fp_border(width = 3)) %>%
 #     hline_header(border = officer::fp_border( width = 1.5), bottom=F) %>%
 #     # Set background colors for rows
-#     flextable::bg(i = odd, bg = "#EFEFEF", part = "body") %>%
-#     flextable::bg(i = even, bg = "transparent", part = "body") %>%
-#     {if(!is.null(group.row.id)) flextable::bg(x=., i = group.row.id, bg = "#CFCFCF", part = "body") else .} %>%
-#     flextable::hline(i=setdiff(group.row.id-1, c(0)), j = 1, part="body", border = officer::fp_border(width = 1.5)) %>%
+#     bg(i = odd, bg = "#EFEFEF", part = "body") %>%
+#     bg(i = even, bg = "transparent", part = "body") %>%
+#     {if(!is.null(group.row.id)) bg(x=., i = group.row.id, bg = "#CFCFCF", part = "body") else .} %>%
+#     hline(i=setdiff(group.row.id-1, c(0)), j = 1, part="body", border = officer::fp_border(width = 1.5)) %>%
 #     %>%
-#     flextable::footnote(
+#     footnote(
 #       i = 1 + num_head,
 #       j = 1,
-#       value = flextable::as_paragraph(
+#       value = as_paragraph(
 #         table_desc
 #       ),
 #       ref_symbols = c("*"),
 #       part = "header"
 #     ) %>%
-#     flextable::merge_v(part = 'header') %>%
-#     #flextable::fontsize(size=font_size, part = 'all') %>%
+#     merge_v(part = 'header') %>%
+#     #fontsize(size=font_size, part = 'all') %>%
 #     {if(!is.null(group.row.id)){
-#       flextable::bold(., i=group.row.id, j = 1, part="body")
+#       bold(., i=group.row.id, j = 1, part="body")
 #     } else {
 #       .
 #     }} %>%
-#     flextable::merge_v(part = 'header')
+#     merge_v(part = 'header')
 #
 #
 #   ref_symbols <- letters
@@ -366,11 +390,11 @@ to_word <- function(
 #
 #
 #       out %<>%
-#         flextable::footnote(
+#         footnote(
 #           i = note_indx,
 #           j = 1,
-#           value = flextable::as_paragraph(
-#             flextable::as_chunk(note_fill)
+#           value = as_paragraph(
+#             as_chunk(note_fill)
 #           ),
 #           part = 'body',
 #           ref_symbols = ref_symbols[k]
@@ -381,13 +405,13 @@ to_word <- function(
 #
 #   if(!is.null(table_abbr)){
 #     out %<>%
-#       flextable::footnote(
+#       footnote(
 #         i=1, j=1, ref_symbols = "",
-#         value = flextable::as_paragraph(table_abbr)
+#         value = as_paragraph(table_abbr)
 #       )
 #   }
 #
 # }
 #
 # out %>%
-#   flextable::fontsize(size = font_size, part = 'all')
+#   fontsize(size = font_size, part = 'all')
