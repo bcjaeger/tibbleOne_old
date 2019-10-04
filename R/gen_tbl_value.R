@@ -74,14 +74,20 @@ ctns_tbl_value <- function(
   include_pval
 ){
 
+  if(all(is.na(data[[variable]]))){
+    stop(glue("All values of {variable} are missing!"), call. = FALSE)
+  }
+
   vals_overall = ctns_fun(data[[variable]])
 
   if(stratified_table){
+
     vals_by_group = tapply(
       data[[variable]],
       data[['.strat']],
       ctns_fun
     )
+
   }
 
   if(stratified_table & include_pval){
@@ -123,9 +129,14 @@ median_iqr <- function(variable){
 
 mean_sd<-function(variable){
 
+  .mn <- try(mean(variable, na.rm = TRUE))
+  if(class(.mn)[1] == 'try-error') .mn <- "NA"
+
+  .sd <- try(sd(variable, na.rm = TRUE))
+  if(class(.sd)[1] == 'try-error') .sd <- "NA"
+
   paste0(
-    adapt_round(mean(variable, na.rm = TRUE)), ' (',
-    adapt_round(sd(variable, na.rm = TRUE)), ')'
+    adapt_round(.mn), ' (', adapt_round(.sd), ')'
   )
 
 }

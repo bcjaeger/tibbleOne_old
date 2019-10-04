@@ -121,11 +121,10 @@
     <p>pass a tibble_one object into kable</p>
     </div>
 
-    <pre class="usage"><span class='fu'>to_kable</span>(<span class='no'>object</span>, <span class='kw'>format</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>use_groups</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>indent_groups</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>footnote_notation</span> <span class='kw'>=</span> <span class='st'>"symbol"</span>,
-  <span class='kw'>include_1st_header</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>include_2nd_header</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>include_3rd_header</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>escape</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>bold_headers</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>to_kable</span>(<span class='no'>object</span>, <span class='kw'>use_groups</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>indent_groups</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>footnote_notation</span> <span class='kw'>=</span> <span class='st'>"symbol"</span>, <span class='kw'>include_1st_header</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>include_2nd_header</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>include_3rd_header</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>bold_headers</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -135,20 +134,18 @@
       <td><p>a tibble_one object</p></td>
     </tr>
     <tr>
-      <th>format</th>
-      <td><p>character, format for printing</p></td>
-    </tr>
-    <tr>
       <th>use_groups</th>
       <td><p>T/F, should rows be grouped?</p></td>
     </tr>
     <tr>
       <th>indent_groups</th>
-      <td><p>T/F, should entries within groups be indented? (this has no effect if <code>use_groups</code> is <code>FALSE</code>)</p></td>
+      <td><p>T/F, should entries within groups be indented?
+(this has no effect if <code>use_groups</code> is <code>FALSE</code>)</p></td>
     </tr>
     <tr>
       <th>footnote_notation</th>
-      <td><p>character value indicating footnote symbols to use in tables. Eligible values are <code>symbol</code>, <code>number</code>, and <code>alphabet</code>.</p></td>
+      <td><p>character value indicating footnote symbols to
+use in tables. Eligible values are <code>symbol</code>, <code>number</code>, and <code>alphabet</code>.</p></td>
     </tr>
     <tr>
       <th>include_1st_header</th>
@@ -163,8 +160,22 @@
       <td><p>T/F, should top header be included?</p></td>
     </tr>
     <tr>
+      <th>bold_headers</th>
+      <td><p>T/F, should header labels be printed in bold?</p></td>
+    </tr>
+    <tr>
       <th>...</th>
-      <td><p>arguments passed to kable function</p></td>
+      <td><p>Arguments passed on to <code><a href='https://rdrr.io/pkg/knitr/man/kable.html'>knitr::kable</a></code></p><dl class='dl-horizontal'>
+  <dt>format</dt><dd><p>A character string. Possible values are <code>latex</code>,
+<code>html</code>, <code>markdown</code>, <code>pandoc</code>, and <code>rst</code>; this will be
+automatically determined if the function is called within <span class="pkg">knitr</span>; it
+can also be set in the global option <code>knitr.table.format</code>. If
+<code>format</code> is a function, it must return a character string.</p></dd>
+  <dt>caption</dt><dd><p>The table caption.</p></dd>
+  <dt>label</dt><dd><p>The table reference label. By default, the label is obtained
+from <code>knitr::opts_current$get('label')</code>.</p></dd>
+
+</dl></td>
     </tr>
     </table>
 

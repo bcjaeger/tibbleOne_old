@@ -11,12 +11,36 @@
 #'   variable. A warning message is printed if a factor variable
 #'   has more categories than `max_catg`.
 #'
+#' @return A list containing components of `data`, `group_levels`,
+#'   and `var_levels`. The `data` component comprises 8 columns:
+#'
+#'  - variable: variable name - this is the column name of the variable.
+#'
+#'  - label: variable labels - this is presented in tables
+#'
+#'  - type: type of variable (numeric or factor)
+#'
+#'  - unit: units for continuous variables
+#'
+#'  - group: a group identifier for each variable
+#'
+#'  - abbr: abbreviations associated with the label of a variable
+#'
+#'  - note: strings that will be place in tables as a footnote
+#'
+#'  - labels: labels of variables, including categories of factors.
+#'
+#'  The `group_levels` component shows the order that groups will
+#'  appear in the table, and `var_levels` shows the order that
+#'  variables will appear in the table and within groups.
+#'
 #' @export
 
 
 build_meta <- function(
   data,
   expand_binary_catgs = FALSE,
+  add_perc_to_cats = TRUE,
   max_catgs = 10
 ){
 
@@ -33,7 +57,7 @@ build_meta <- function(
     abbr     = map(variable, ~get_abbrs(data, .x)),
     note     = map(variable, ~get_notes(data, .x)),
     labels   = pmap(
-      list(
+      .l = list(
         variable,
         type,
         label,
@@ -79,6 +103,10 @@ build_meta <- function(
       variable, label, type, unit, group, abbr, note, labels
     )
 
+  if(add_perc_to_cats){
+    mta_data %<>% mutate(unit = if_else(type == 'factor', '%', unit))
+  }
+
   if(any(map_dbl(mta_data$labels, length)>=max_catgs)){
 
     out_variables <- map_dbl(mta_data$labels, length) %>%
@@ -88,11 +116,9 @@ build_meta <- function(
       mutate(out = paste0(name, ' (',value,' categories)')) %>%
       pluck('out')
 
-    out_msg <- paste(
-      "Some factors have >", max_catgs, "categories.",
-      "Should these be numeric?",
-      glue::glue_collapse(out_variables,sep = ", ", last = ", and "),
-      sep = '\n'
+    out_msg <- glue(
+      "Some factors have > {max_catgs} categories. \\
+      Should these be numeric? {list_things(out_variables)}"
     )
 
     warning(out_msg, call. = FALSE)

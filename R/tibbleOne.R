@@ -14,7 +14,7 @@
 #'
 #' @importFrom tibble tibble as_tibble enframe deframe
 #'
-#' @importFrom forcats fct_inorder fct_relevel
+#' @importFrom forcats fct_inorder fct_relevel fct_explicit_na
 #'
 #' @importFrom labelled var_label set_variable_labels var_label<-
 #'

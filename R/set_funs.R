@@ -1,22 +1,31 @@
 #' Set variable attributes
 #'
 #' @description These functions allow you to embed attributes in data
-#'  so that you only need to think about them once.
+#'  so that you only need to think about them once. Some functions
+#'  may overwrite or delete attributes in data, so it is recommended
+#'  that you create a `meta` data object with the [build_meta] function
+#'  after you have set variable labels, groups, notes, abbreviations,
+#'  and units.
 #'
 #' @details
 #'
-#'  - \code{\link{tibble_one}} will handle attributes of data automatically,
-#'  e.g., replacing variable names with variable labels, and placing variable
-#'   acronyms (i.e., abbreviations) at the bottom of the table in a footnote.
+#'  - [tibble_one] will handle attributes of data automatically,
+#'   e.g., replacing variable names with variable labels, and placing
+#'   variable acronyms (i.e., abbreviations) at the bottom of the
+#'   table in a footnote.
 #'
 #'  - Use `set_variable_labels()` to set the values that will represent
 #'  variables in table one.
+#'
 #'  - Use `set_variable_groups()` to change the
 #'  variables that are listed in the variable categories of table one.
+#'
 #'  - Use `set_variable_notes` to add descriptions of variables that will
 #'  be placed at the bottom of table one as a footnote.
+#'
 #'  - Use `set_variable_abbrs` to indicate what acronyms in variable
 #'  labels mean (see examples).
+#'
 #'  - Use `set_variable_units` to indicate the unit of measurement for
 #'  continuous variables.
 #'
@@ -25,14 +34,17 @@
 #'  `set_variable_labels` will set the label for `gfr_variable` as the
 #'  indicated string. Since GFR is an acronym, we would also want to use
 #'  `set_variable_abbrs()` and say gfr_variable = c("GFR" =
-#'  "glomerular filtration rate") (see examples for more detail).
+#'  "glomerular filtration rate") (see examples).
 #'
 #' @family set variable attributes
 #'
-#' @param data a data frame or \code{\link[tibble]{tibble}}.
+#' @param data a data frame.
 #' @param ... name-value pairs of variable groups and names (see examples)
 #'
-#' @return a data frame or \code{\link[tibble]{tibble}}.
+#' @return a [tibble][tibble::tibble-package].
+#'
+#' @author Joseph Larmarange, author of the [labelled] package, is the
+#'   author of the `set_variable_labels` function.
 #'
 #' @examples
 #'
@@ -63,6 +75,7 @@
 #' build_meta(df)
 #'
 #' @export
+#'
 set_variable_labels <- function(data, ...){
 
   .dots <- list(...)

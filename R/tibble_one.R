@@ -43,9 +43,6 @@
 #' @param include_freq T/F, should frequency values be included for
 #'   categorical variables?
 #'
-#' @param include_miss_info T/F, should the table include information
-#'   on percent of missing values?
-#'
 #' @export
 #'
 #' @examples
@@ -73,7 +70,6 @@
 # include_pval = FALSE
 # include_freq = FALSE
 # expand_binary_catgs = FALSE
-# include_miss_info = FALSE
 
 tibble_one <- function(
   data,
@@ -86,8 +82,7 @@ tibble_one <- function(
   specs_table_tests = NULL,
   expand_binary_catgs = FALSE,
   include_pval=FALSE,
-  include_freq=FALSE,
-  include_miss_info=FALSE
+  include_freq=FALSE
 ){
 
   # Identify row, stratification, and by variables
@@ -356,10 +351,19 @@ tibble_one <- function(
         }
       )
     ) %>%
-    select(
-      variable, unit, labels, tbl_val, group
-    ) %>%
-    tidyr::unnest(cols = c(labels, tbl_val)) %>%
+    select(variable, unit, labels, tbl_val, group) %>%
+    tidyr::unnest(cols = c(labels, tbl_val))
+
+  # Fix percents for factors with >=3 categories
+  for(i in 2:nrow(table_data)){
+
+    if(table_data$variable[i] == table_data$variable[i-1]){
+      table_data$unit[i] <- NA_character_
+    }
+
+  }
+
+  table_data %<>%
     bind_rows(descr_row, .) %>%
     mutate(
       variable = factor(
@@ -420,7 +424,6 @@ tibble_one <- function(
   attr(table_data, 'notes') <- table_notes
   attr(table_data, 'descr') <- table_value_description
   attr(table_data, 'allcats') <- expand_binary_catgs
-  attr(table_data, 'missinf') <- include_miss_info
 
   # set class to include tibble_one
   class(table_data) %<>% c('tibble_one')

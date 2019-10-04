@@ -69,6 +69,9 @@ find_indent_rows <- function(x){
 
 edit_pval <- function(pval){
 
+  if(!is.numeric(pval)) return("NA")
+  if(is.na(pval)) return("NA")
+
   map_chr(pval, .f=function(x){
     if(x < 0.001){
       paste('< 0.001')

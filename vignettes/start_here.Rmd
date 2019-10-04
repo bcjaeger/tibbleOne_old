@@ -102,13 +102,7 @@ to_kable(tb1,) %>%
 
 ```
 
-`kable` also provides LaTex tables. 
-
-```{r, echo = FALSE, out.width='650px'}
-
-knitr::include_graphics("kable_latex.png")
-
-```
+`kable` also provides LaTex tables when the markdown output is set as a pdf.
 
 ## `flextable` output
 

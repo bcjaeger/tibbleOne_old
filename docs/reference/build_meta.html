@@ -128,11 +128,20 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>data</th>
-      <td><p>a data frame with any combination of the following attributes: <code>label</code>, <code>unit</code>, <code>group</code>, <code>abbrs</code>, and <code>notes</code>. Columns in the meta data are based on these attributes.</p></td>
+      <td><p>a data frame with any combination of the following
+attributes: <code>label</code>, <code>unit</code>, <code>group</code>, <code>abbrs</code>, and <code>notes</code>.
+Columns in the meta data are based on these attributes.</p></td>
     </tr>
     <tr>
       <th>expand_binary_catgs</th>
-      <td><p>T/F, should all categories be included for binary categorical variables? (This only applies to binary variables.)</p></td>
+      <td><p>T/F, should all categories be included for
+binary categorical variables? (This only applies to binary variables.)</p></td>
+    </tr>
+    <tr>
+      <th>max_catgs</th>
+      <td><p>largest number of categories accepted in a factor
+variable. A warning message is printed if a factor variable
+has more categories than <code>max_catg</code>.</p></td>
     </tr>
     </table>
 

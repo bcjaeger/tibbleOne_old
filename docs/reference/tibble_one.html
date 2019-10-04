@@ -124,8 +124,7 @@
     <pre class="usage"><span class='fu'>tibble_one</span>(<span class='no'>data</span>, <span class='kw'>meta_data</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>row_vars</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>strat</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>specs_table_vals</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>specs_table_tests</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>expand_binary_catgs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>include_pval</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>include_freq</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>include_miss_info</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+  <span class='kw'>include_pval</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>include_freq</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -194,11 +193,6 @@ stratification.</p></td>
       <td><p>T/F, should frequency values be included for
 categorical variables?</p></td>
     </tr>
-    <tr>
-      <th>include_miss_info</th>
-      <td><p>T/F, should the table include information
-on percent of missing values?</p></td>
-    </tr>
     </table>
 
 
@@ -206,15 +200,36 @@ on percent of missing values?</p></td>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>"pbc_tbl1"</span>)
 <span class='co'># report median albumin instead of mean</span>
 <span class='co'># use kruskal wallis test for albumin</span>
-<span class='no'>pbc_tbl1</span> <span class='kw'>%&gt;%</span>
-  <span class='fu'>tibble_one</span>(
-    <span class='kw'>formula</span> <span class='kw'>=</span> ~ <span class='no'>.</span> <span class='kw'>|</span> <span class='no'>trt</span>,
-    <span class='kw'>include_freq</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-    <span class='kw'>include_pval</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-    <span class='kw'>specs_table_vals</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='kw'>albumin</span> <span class='kw'>=</span> <span class='st'>'median'</span>),
-    <span class='kw'>specs_table_tests</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='kw'>albumin</span> <span class='kw'>=</span> <span class='st'>'nopars'</span>)
-  )</div><div class='output co'>#&gt; <span class='error'>Error in arrange(., group, variable): could not find function "arrange"</span></div><div class='input'>
-</div></pre>
+<span class='fu'>tibble_one</span>(
+  <span class='no'>pbc_tbl1</span>,
+  <span class='kw'>formula</span> <span class='kw'>=</span> ~ <span class='no'>.</span> <span class='kw'>|</span> <span class='no'>trt</span>,
+  <span class='kw'>include_freq</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>include_pval</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>specs_table_vals</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='kw'>albumin</span> <span class='kw'>=</span> <span class='st'>'median'</span>),
+  <span class='kw'>specs_table_tests</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='kw'>albumin</span> <span class='kw'>=</span> <span class='st'>'nopars'</span>)
+)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 19 x 7</span><span>
+#&gt;    group variable labels         Overall    `D-penicillmain` Placebo   `P-value`
+#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;fct&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;fct&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>          </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>      </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>    
+#&gt; </span><span style='color: #555555;'> 1</span><span> None  descr    No. of observ~ 418        158              154       </span><span style='color: #555555;'>""</span><span>       
+#&gt; </span><span style='color: #555555;'> 2</span><span> None  age      Age            50.7 (10.~ 51.4 (11.0)      48.6 (9.~ 0.018    
+#&gt; </span><span style='color: #555555;'> 3</span><span> None  sex      Female         89.5       86.7             90.3      0.421    
+#&gt; </span><span style='color: #555555;'> 4</span><span> None  status   Status         </span><span style='color: #555555;'>""</span><span>         </span><span style='color: #555555;'>""</span><span>               </span><span style='color: #555555;'>""</span><span>        0.894    
+#&gt; </span><span style='color: #555555;'> 5</span><span> None  status   Censored       55.5       52.5             55.2      </span><span style='color: #555555;'>""</span><span>       
+#&gt; </span><span style='color: #555555;'> 6</span><span> None  status   Transplant     5.98       6.33             5.84      </span><span style='color: #555555;'>""</span><span>       
+#&gt; </span><span style='color: #555555;'> 7</span><span> None  status   Dead           38.5       41.1             39.0      </span><span style='color: #555555;'>""</span><span>       
+#&gt; </span><span style='color: #555555;'> 8</span><span> None  stage    Stage          </span><span style='color: #555555;'>""</span><span>         </span><span style='color: #555555;'>""</span><span>               </span><span style='color: #555555;'>""</span><span>        0.201    
+#&gt; </span><span style='color: #555555;'> 9</span><span> None  stage    One            5.10       7.59             2.60      </span><span style='color: #555555;'>""</span><span>       
+#&gt; </span><span style='color: #555555;'>10</span><span> None  stage    Two            22.3       22.2             20.8      </span><span style='color: #555555;'>""</span><span>       
+#&gt; </span><span style='color: #555555;'>11</span><span> None  stage    Three          37.6       35.4             41.6      </span><span style='color: #555555;'>""</span><span>       
+#&gt; </span><span style='color: #555555;'>12</span><span> None  stage    Four           35.0       34.8             35.1      </span><span style='color: #555555;'>""</span><span>       
+#&gt; </span><span style='color: #555555;'>13</span><span> None  ascites  Ascites        7.69       8.86             6.49      0.567    
+#&gt; </span><span style='color: #555555;'>14</span><span> None  bili     Bili           3.22 (4.4~ 2.87 (3.63)      3.65 (5.~ 0.133    
+#&gt; </span><span style='color: #555555;'>15</span><span> None  edema    Edema          </span><span style='color: #555555;'>""</span><span>         </span><span style='color: #555555;'>""</span><span>               </span><span style='color: #555555;'>""</span><span>        0.877    
+#&gt; </span><span style='color: #555555;'>16</span><span> None  edema    None           84.7       83.5             85.1      </span><span style='color: #555555;'>""</span><span>       
+#&gt; </span><span style='color: #555555;'>17</span><span> None  edema    Untreated or ~ 10.5       10.1             8.44      </span><span style='color: #555555;'>""</span><span>       
+#&gt; </span><span style='color: #555555;'>18</span><span> None  edema    Treatment res~ 4.78       6.33             6.49      </span><span style='color: #555555;'>""</span><span>       
+#&gt; </span><span style='color: #555555;'>19</span><span> None  albumin  Albumin        3.53 [3.2~ 3.56 [3.21-3.83] 3.54 [3.~ 0.874    </div><div class='input'>
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

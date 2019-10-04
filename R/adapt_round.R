@@ -5,7 +5,8 @@
 
 adapt_round <- function(x){
 
-  if(all(is.na(x))) stop("All values of x are NA")
+  if(is.character(x)) return("NA")
+  if(all(is.na(x))) return("NA")
 
   x_abs <- abs(x)
 

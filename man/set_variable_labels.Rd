@@ -19,22 +19,27 @@ set_variable_notes(data, ...)
 set_variable_units(data, ...)
 }
 \arguments{
-\item{data}{a data frame or \code{\link[tibble]{tibble}}.}
+\item{data}{a data frame.}
 
 \item{...}{name-value pairs of variable groups and names (see examples)}
 }
 \value{
-a data frame or \code{\link[tibble]{tibble}}.
+a \link[tibble:tibble-package]{tibble}.
 }
 \description{
 These functions allow you to embed attributes in data
-so that you only need to think about them once.
+so that you only need to think about them once. Some functions
+may overwrite or delete attributes in data, so it is recommended
+that you create a \code{meta} data object with the \link{build_meta} function
+after you have set variable labels, groups, notes, abbreviations,
+and units.
 }
 \details{
 \itemize{
-\item \code{\link{tibble_one}} will handle attributes of data automatically,
-e.g., replacing variable names with variable labels, and placing variable
-acronyms (i.e., abbreviations) at the bottom of the table in a footnote.
+\item \link{tibble_one} will handle attributes of data automatically,
+e.g., replacing variable names with variable labels, and placing
+variable acronyms (i.e., abbreviations) at the bottom of the
+table in a footnote.
 \item Use \code{set_variable_labels()} to set the values that will represent
 variables in table one.
 \item Use \code{set_variable_groups()} to change the
@@ -52,7 +57,7 @@ For example, writing \code{gfr_variable} = "estimated GFR" as an input to
 \code{set_variable_labels} will set the label for \code{gfr_variable} as the
 indicated string. Since GFR is an acronym, we would also want to use
 \code{set_variable_abbrs()} and say gfr_variable = c("GFR" =
-"glomerular filtration rate") (see examples for more detail).
+"glomerular filtration rate") (see examples).
 }
 \examples{
 
@@ -82,5 +87,9 @@ df <- set_variable_notes(df,
 
 build_meta(df)
 
+}
+\author{
+Joseph Larmarange, author of the \link{labelled} package, is the
+author of the \code{set_variable_labels} function.
 }
 \concept{set variable attributes}

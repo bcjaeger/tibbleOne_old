@@ -28,85 +28,40 @@ devtools::install_github('bcjaeger/tibbleOne')
 
 ## Example
 
-This example shows the basic elements of tibbleOne. First, we apply some aesthetic changes to the data:
+For a more detailed example, see the 'start here' vignette. This example shows basic elements of `tibbleOne`.
 
-```{r example}
+```{r example, message = FALSE}
 
-library(labelled)
-library(tidyverse)
-library(magrittr)
-library(survival)
+library(knitr)
 library(kableExtra)
 library(tibbleOne)
-
-data = pbc %>%
-  dplyr::select(
-    age, sex, status, trt, stage, ascites, bili, edema, albumin
-  ) %>%
-  dplyr::mutate(
-    status=factor(
-      status, levels = c(0:2),
-      labels = c("Censored", "Transplant", "Dead")
-    ),
-    stage = factor(
-      stage, levels = c(1:4),
-      labels = c("One", "Two", "Three", "Four")
-    ),
-    trt=factor(
-      trt, levels=c(1:2),
-      labels = c("Drug A", "Drug B")
-    ),
-    ascites=factor(
-      ascites, levels=c(0:1),
-      labels = c("No", "Yes")
-    ),
-    sex = fct_recode(
-      sex,
-      'Male'='m',
-      'Female'='f'
-    ),
-    edema = factor(
-      edema,
-      levels=c(0, 0.5, 1),
-      labels=c("None", "A little", "Lots")
-    )
-  ) 
+library(tidyverse)
 
 ```
 
-Next, we label the columns of the data. These labels will be passed along when our table is made.
+The first step should be setting labels for variables that will be in the table. This can be done using `set_variable_labels` and then building a `meta` data set. You may also just pipe the labelled dataset into `tibble_one()`, but it is generally more useful to keep the `meta` data object in case you need to use the labels for other tables in your analysis. 
 
 ```{r}
 
-data = data %>%
+meta <- pbc_tbl1 %>% 
   set_variable_labels(
     status = "Status at last contact",
     trt = "Treatment group",
-    age = 'Age, years',
+    age = 'Age',
     sex = 'Sex at birth',
     ascites = 'Ascites',
-    bili = 'Bilirubin levels, mg/dl',
-    edema = 'Is there Edema?'
+    bili = 'Bilirubin levels',
+    edema = 'Edema',
+    albumin = 'Serum Albumin'
   ) %>%
-  set_variable_groups(
-    Outcomes = c('status'),
-    Exposures = c('ascites','bili','edema','trt','albumin','stage')
-  ) 
+  build_meta()
 
-```
-
-Now we can apply the `tibble_one` function to get an object that we can pass along to an Rmarkdown document. 
-
-```{r}
-
-tbl_one = data %>%
-  tibble_one(
-    formula = ~ . | trt,
-    strat = sex,
-    by = edema,
-    include_freq = FALSE,
-    include_pval = TRUE
-  )
+tbl_one <- tibble_one(
+  data = pbc_tbl1,
+  meta_data = meta,
+  formula = ~ . | trt,
+  include_pval = TRUE
+)
 
 ```
 
@@ -114,12 +69,10 @@ Last step, we pass `tbl_one` into the `to_kable()` function, which provides a co
 
 ```{r}
 
+cap <- 'Characteristics of patients with primary biliarry cirrhosis.'
+
 tbl_one %>% 
-  to_kable(
-    use_groups = TRUE,
-    indent_groups = FALSE,
-    escape = FALSE
-  ) %>%
+  to_kable(caption = cap) %>%
   kable_styling(
     position = 'center',
     bootstrap_options = c('striped')

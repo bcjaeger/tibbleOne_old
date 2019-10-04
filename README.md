@@ -20,112 +20,45 @@ devtools::install_github('bcjaeger/tibbleOne')
 
 ## Example
 
-This example shows the basic elements of tibbleOne. First, we apply some
-aesthetic changes to the data:
+For a more detailed example, see the ‘start here’ vignette. This example
+shows basic elements of `tibbleOne`.
 
 ``` r
 
-library(labelled)
-library(tidyverse)
-#> -- Attaching packages ------------------------------------------------------------ tidyverse 1.2.1 --
-#> v tibble  2.1.3     v purrr   0.3.2
-#> v tidyr   1.0.0     v dplyr   0.8.3
-#> v readr   1.3.1     v stringr 1.4.0
-#> v tibble  2.1.3     v forcats 0.4.0
-#> -- Conflicts --------------------------------------------------------------- tidyverse_conflicts() --
-#> x dplyr::filter() masks stats::filter()
-#> x dplyr::lag()    masks stats::lag()
-library(magrittr)
-#> 
-#> Attaching package: 'magrittr'
-#> The following object is masked from 'package:purrr':
-#> 
-#>     set_names
-#> The following object is masked from 'package:tidyr':
-#> 
-#>     extract
-library(survival)
+library(knitr)
 library(kableExtra)
-#> 
-#> Attaching package: 'kableExtra'
-#> The following object is masked from 'package:dplyr':
-#> 
-#>     group_rows
 library(tibbleOne)
-#> 
-#> Attaching package: 'tibbleOne'
-#> The following object is masked from 'package:labelled':
-#> 
-#>     set_variable_labels
-
-data = pbc %>%
-  dplyr::select(
-    age, sex, status, trt, stage, ascites, bili, edema, albumin
-  ) %>%
-  dplyr::mutate(
-    status=factor(
-      status, levels = c(0:2),
-      labels = c("Censored", "Transplant", "Dead")
-    ),
-    stage = factor(
-      stage, levels = c(1:4),
-      labels = c("One", "Two", "Three", "Four")
-    ),
-    trt=factor(
-      trt, levels=c(1:2),
-      labels = c("Drug A", "Drug B")
-    ),
-    ascites=factor(
-      ascites, levels=c(0:1),
-      labels = c("No", "Yes")
-    ),
-    sex = fct_recode(
-      sex,
-      'Male'='m',
-      'Female'='f'
-    ),
-    edema = factor(
-      edema,
-      levels=c(0, 0.5, 1),
-      labels=c("None", "A little", "Lots")
-    )
-  ) 
+library(tidyverse)
 ```
 
-Next, we label the columns of the data. These labels will be passed
-along when our table is made.
+The first step should be setting labels for variables that will be in
+the table. This can be done using `set_variable_labels` and then
+building a `meta` data set. You may also just pipe the labelled dataset
+into `tibble_one()`, but it is generally more useful to keep the `meta`
+data object in case you need to use the labels for other tables in your
+analysis.
 
 ``` r
 
-data = data %>%
+meta <- pbc_tbl1 %>% 
   set_variable_labels(
     status = "Status at last contact",
     trt = "Treatment group",
-    age = 'Age, years',
+    age = 'Age',
     sex = 'Sex at birth',
     ascites = 'Ascites',
-    bili = 'Bilirubin levels, mg/dl',
-    edema = 'Is there Edema?'
+    bili = 'Bilirubin levels',
+    edema = 'Edema',
+    albumin = 'Serum Albumin'
   ) %>%
-  set_variable_groups(
-    Outcomes = c('status'),
-    Exposures = c('ascites','bili','edema','trt','albumin','stage')
-  ) 
-```
+  build_meta()
 
-Now we can apply the `tibble_one` function to get an object that we can
-pass along to an Rmarkdown document.
-
-``` r
-
-tbl_one = data %>%
-  tibble_one(
-    formula = ~ . | trt,
-    strat = sex,
-    by = edema,
-    include_freq = FALSE,
-    include_pval = TRUE
-  )
+tbl_one <- tibble_one(
+  data = pbc_tbl1,
+  meta_data = meta,
+  formula = ~ . | trt,
+  include_pval = TRUE
+)
 ```
 
 Last step, we pass `tbl_one` into the `to_kable()` function, which
@@ -134,12 +67,10 @@ like the type of Table 1 that you may see in a published article.
 
 ``` r
 
+cap <- 'Characteristics of patients with primary biliarry cirrhosis.'
+
 tbl_one %>% 
-  to_kable(
-    use_groups = TRUE,
-    indent_groups = FALSE,
-    escape = FALSE
-  ) %>%
+  to_kable(caption = cap) %>%
   kable_styling(
     position = 'center',
     bootstrap_options = c('striped')
@@ -147,6 +78,13 @@ tbl_one %>%
 ```
 
 <table class="table table-striped" style="margin-left: auto; margin-right: auto;">
+
+<caption>
+
+Characteristics of patients with primary biliarry
+cirrhosis.
+
+</caption>
 
 <thead>
 
@@ -186,13 +124,13 @@ Overall<br>(N = 418)
 
 <th style="text-align:center;">
 
-Drug A<br>(N = 158)
+D-penicillmain<br>(N = 158)
 
 </th>
 
 <th style="text-align:center;">
 
-Drug B<br>(N = 154)
+Placebo<br>(N = 154)
 
 </th>
 
@@ -212,7 +150,7 @@ P-value
 
 <td style="text-align:left;">
 
-Age, years
+Age
 
 </td>
 
@@ -246,7 +184,7 @@ Age, years
 
 <td style="text-align:left;">
 
-Female
+Female, %
 
 </td>
 
@@ -276,21 +214,11 @@ Female
 
 </tr>
 
-<tr grouplength="4">
-
-<td colspan="5" style="border-bottom: 1px solid;">
-
-<strong>Outcomes</strong>
-
-</td>
-
-</tr>
-
 <tr>
 
 <td style="text-align:left;">
 
-Status at last contact
+Status at last contact, %
 
 </td>
 
@@ -410,247 +338,11 @@ Dead
 
 </tr>
 
-<tr grouplength="12">
-
-<td colspan="5" style="border-bottom: 1px solid;">
-
-<strong>Exposures</strong>
-
-</td>
-
-</tr>
-
 <tr>
 
 <td style="text-align:left;">
 
-Ascites
-
-</td>
-
-<td style="text-align:center;">
-
-7.69
-
-</td>
-
-<td style="text-align:center;">
-
-8.86
-
-</td>
-
-<td style="text-align:center;">
-
-6.49
-
-</td>
-
-<td style="text-align:center;">
-
-0.567
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Bilirubin levels, mg/dl
-
-</td>
-
-<td style="text-align:center;">
-
-3.22 (4.41)
-
-</td>
-
-<td style="text-align:center;">
-
-2.87 (3.63)
-
-</td>
-
-<td style="text-align:center;">
-
-3.65 (5.28)
-
-</td>
-
-<td style="text-align:center;">
-
-0.133
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Is there Edema?
-
-</td>
-
-<td style="text-align:center;">
-
-</td>
-
-<td style="text-align:center;">
-
-</td>
-
-<td style="text-align:center;">
-
-</td>
-
-<td style="text-align:center;">
-
-0.877
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-
-None
-
-</td>
-
-<td style="text-align:center;">
-
-84.7
-
-</td>
-
-<td style="text-align:center;">
-
-83.5
-
-</td>
-
-<td style="text-align:center;">
-
-85.1
-
-</td>
-
-<td style="text-align:center;">
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-
-A little
-
-</td>
-
-<td style="text-align:center;">
-
-10.5
-
-</td>
-
-<td style="text-align:center;">
-
-10.1
-
-</td>
-
-<td style="text-align:center;">
-
-8.44
-
-</td>
-
-<td style="text-align:center;">
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-
-Lots
-
-</td>
-
-<td style="text-align:center;">
-
-4.78
-
-</td>
-
-<td style="text-align:center;">
-
-6.33
-
-</td>
-
-<td style="text-align:center;">
-
-6.49
-
-</td>
-
-<td style="text-align:center;">
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Albumin
-
-</td>
-
-<td style="text-align:center;">
-
-3.50 (0.42)
-
-</td>
-
-<td style="text-align:center;">
-
-3.52 (0.44)
-
-</td>
-
-<td style="text-align:center;">
-
-3.52 (0.40)
-
-</td>
-
-<td style="text-align:center;">
-
-0.874
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Stage
+Stage, %
 
 </td>
 
@@ -797,6 +489,232 @@ Four
 </td>
 
 <td style="text-align:center;">
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Ascites, %
+
+</td>
+
+<td style="text-align:center;">
+
+7.69
+
+</td>
+
+<td style="text-align:center;">
+
+8.86
+
+</td>
+
+<td style="text-align:center;">
+
+6.49
+
+</td>
+
+<td style="text-align:center;">
+
+0.567
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Bilirubin levels
+
+</td>
+
+<td style="text-align:center;">
+
+3.22 (4.41)
+
+</td>
+
+<td style="text-align:center;">
+
+2.87 (3.63)
+
+</td>
+
+<td style="text-align:center;">
+
+3.65 (5.28)
+
+</td>
+
+<td style="text-align:center;">
+
+0.133
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Edema, %
+
+</td>
+
+<td style="text-align:center;">
+
+</td>
+
+<td style="text-align:center;">
+
+</td>
+
+<td style="text-align:center;">
+
+</td>
+
+<td style="text-align:center;">
+
+0.877
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+
+None
+
+</td>
+
+<td style="text-align:center;">
+
+84.7
+
+</td>
+
+<td style="text-align:center;">
+
+83.5
+
+</td>
+
+<td style="text-align:center;">
+
+85.1
+
+</td>
+
+<td style="text-align:center;">
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+
+Untreated or successfully treated
+
+</td>
+
+<td style="text-align:center;">
+
+10.5
+
+</td>
+
+<td style="text-align:center;">
+
+10.1
+
+</td>
+
+<td style="text-align:center;">
+
+8.44
+
+</td>
+
+<td style="text-align:center;">
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+
+Treatment resistant
+
+</td>
+
+<td style="text-align:center;">
+
+4.78
+
+</td>
+
+<td style="text-align:center;">
+
+6.33
+
+</td>
+
+<td style="text-align:center;">
+
+6.49
+
+</td>
+
+<td style="text-align:center;">
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Serum Albumin
+
+</td>
+
+<td style="text-align:center;">
+
+3.50 (0.42)
+
+</td>
+
+<td style="text-align:center;">
+
+3.52 (0.44)
+
+</td>
+
+<td style="text-align:center;">
+
+3.52 (0.40)
+
+</td>
+
+<td style="text-align:center;">
+
+0.874
 
 </td>
 

@@ -38,18 +38,3 @@
 #'   ISBN: 0-387-98784-3.
 "pbc_tbl1"
 
-#' Primary Biliary Cirrhosis meta data
-#'
-#' @description This is a meta data object that pairs with `pbc_tbl1`.
-#'
-#' @format a list containing a data frame with 9 rows and 8 variables.
-#'  - variable: variable name - this is the column name of the variable.
-#'  - label: variable labels - this is presented in tables
-#'  - type: type of variable (numeric or factor)
-#'  - unit: units for continuous variables
-#'  - group: a group identifier for each variable
-#'  - abbr: abbreviations associated with the label of a variable
-#'  - note: strings that will be place in tables as a footnote
-#'  - labels:
-#'
-"pbc_meta"

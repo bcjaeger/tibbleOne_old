@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>easy lists of things — list_things • tibbleOne</title>
+<title>Mayo Clinic Primary Biliary Cirrhosis — pbc_tbl1 • tibbleOne</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,21 @@
 
 
 
-<meta property="og:title" content="easy lists of things — list_things" />
-<meta property="og:description" content="easy lists of things" />
+<meta property="og:title" content="Mayo Clinic Primary Biliary Cirrhosis — pbc_tbl1" />
+<meta property="og:description" content="These data contain a subset of the columns found in
+the pbc data in the survival package. Also, the description
+below is taken from the description provided by the survival
+package.
+cirrhosis (PBC) of the liver conducted between 1974 and 1984. A total
+of 424 PBC patients, referred to Mayo Clinic during that ten-year
+interval, met eligibility criteria for the randomized placebo controlled
+trial of the drug D-penicillamine. The first 312 cases in the data set
+participated in the randomized trial and contain largely complete data.
+The additional 112 cases did not participate in the clinical trial,
+but consented to have basic measurements recorded and to be followed
+for survival. Six of those cases were lost to follow-up shortly after
+diagnosis, so the data here are on an additional 106 cases as well as
+the 312 randomized participants." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -112,32 +125,59 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>easy lists of things</h1>
+    <h1>Mayo Clinic Primary Biliary Cirrhosis</h1>
     
-    <div class="hidden name"><code>list_things.Rd</code></div>
+    <div class="hidden name"><code>pbc_tbl1.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>easy lists of things</p>
+    <p>These data contain a subset of the columns found in
+the <code>pbc</code> data in the <code>survival</code> package. Also, the description
+below is taken from the description provided by the <code>survival</code>
+package.</p>
+<p>cirrhosis (PBC) of the liver conducted between 1974 and 1984. A total
+of 424 PBC patients, referred to Mayo Clinic during that ten-year
+interval, met eligibility criteria for the randomized placebo controlled
+trial of the drug D-penicillamine. The first 312 cases in the data set
+participated in the randomized trial and contain largely complete data.
+The additional 112 cases did not participate in the clinical trial,
+but consented to have basic measurements recorded and to be followed
+for survival. Six of those cases were lost to follow-up shortly after
+diagnosis, so the data here are on an additional 106 cases as well as
+the 312 randomized participants.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>list_things</span>(<span class='no'>things</span>)</pre>
+    <pre class="usage"><span class='no'>pbc_tbl1</span></pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>things</th>
-      <td><p>vector containing things to list</p></td>
-    </tr>
-    </table>
 
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
+
+    <p>a data frame with 418 rows and 9 variables.</p><ul>
+<li><p>age: in years</p></li>
+<li><p>sex: male or female</p></li>
+<li><p>status death, censor, or transplant.</p></li>
+<li><p>trt D-penicillmain, placebo, and not randomized (NA).</p></li>
+<li><p>stage: histologic stage of disease (needs biopsy)</p></li>
+<li><p>ascites: presence of ascites</p></li>
+<li><p>bili: serum bilirunbin (mg/dl)</p></li>
+<li><p>edema: no edema, untreated or successfully treated edema, or
+edema despite diuretic therapy</p></li>
+<li><p>albumin: serum albumin (g/dl)</p></li>
+</ul>
+    <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
+
+    <p>T Therneau and P Grambsch (2000),
+Modeling Survival Data:
+Extending the Cox Model,
+Springer-Verlag, New York.
+ISBN: 0-387-98784-3.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
+      <li><a href="#format">Format</a></li>
+      <li><a href="#source">Source</a></li>
     </ul>
 
   </div>

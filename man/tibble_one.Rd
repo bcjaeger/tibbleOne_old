@@ -7,8 +7,7 @@
 tibble_one(data, meta_data = NULL, formula = NULL, row_vars = NULL,
   strat = NULL, by = NULL, specs_table_vals = NULL,
   specs_table_tests = NULL, expand_binary_catgs = FALSE,
-  include_pval = FALSE, include_freq = FALSE,
-  include_miss_info = FALSE)
+  include_pval = FALSE, include_freq = FALSE)
 }
 \arguments{
 \item{data}{a data frame}
@@ -52,9 +51,6 @@ stratification.}
 
 \item{include_freq}{T/F, should frequency values be included for
 categorical variables?}
-
-\item{include_miss_info}{T/F, should the table include information
-on percent of missing values?}
 }
 \description{
 make a tidy data frame with table one information

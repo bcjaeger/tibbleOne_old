@@ -176,38 +176,47 @@ indicated string. Since GFR is an acronym, we would also want to use
 "glomerular filtration rate") (see examples for more detail).</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>magrittr</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>knitr</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>kableExtra</span>)
-
+    <pre class="examples"><div class='input'>
 <span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(
-  <span class='kw'>gfr</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>mean</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>sd</span> <span class='kw'>=</span> <span class='fl'>30</span>),
-  <span class='kw'>sbp</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>mean</span> <span class='kw'>=</span> <span class='fl'>120</span>, <span class='kw'>sd</span> <span class='kw'>=</span> <span class='fl'>20</span>),
-  <span class='kw'>grp</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>rbinom</a></span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>size</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>prob</span> <span class='kw'>=</span> <span class='fl'>2</span>/<span class='fl'>5</span>)
-) <span class='kw'>%&gt;%</span>
-  <span class='fu'>set_variable_labels</span>(
-    <span class='kw'>gfr</span> <span class='kw'>=</span> <span class='st'>'Estimated GFR'</span>,
-    <span class='kw'>sbp</span> <span class='kw'>=</span> <span class='st'>'Systolic BP'</span>,
-    <span class='kw'>grp</span> <span class='kw'>=</span> <span class='st'>'Arbitrary grouping variable'</span>
-  ) <span class='kw'>%&gt;%</span>
-  <span class='fu'>set_variable_units</span>(
-    <span class='kw'>gfr</span> <span class='kw'>=</span> <span class='st'>'mL/min/1.73 m2'</span>,
-    <span class='kw'>sbp</span> <span class='kw'>=</span> <span class='st'>'mm Hg'</span>
-  ) <span class='kw'>%&gt;%</span>
-  <span class='fu'>set_variable_abbrs</span>(
-    <span class='kw'>gfr</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"GFR"</span> <span class='kw'>=</span> <span class='st'>"glomerular filtration rate"</span>, <span class='st'>"min"</span> <span class='kw'>=</span> <span class='st'>'minute'</span>),
-    <span class='kw'>sbp</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"BP"</span> <span class='kw'>=</span> <span class='st'>"blood pressure"</span>)
-  ) <span class='kw'>%&gt;%</span>
-  <span class='fu'>set_variable_notes</span>(
-    <span class='kw'>sbp</span> <span class='kw'>=</span> <span class='st'>"blood pressure was measured on the left arm by trained personnel"</span>
-  )
+  <span class='kw'>gfr</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>,<span class='fl'>2</span>,<span class='fl'>3</span>),
+  <span class='kw'>sbp</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>,<span class='fl'>2</span>,<span class='fl'>1</span>)
+)
 
-<span class='fu'><a href='tibble_one.html'>tibble_one</a></span>(
-  <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>df</span>,
-  <span class='kw'>formula</span> <span class='kw'>=</span>  ~ <span class='no'>gfr</span> + <span class='no'>sbp</span> <span class='kw'>|</span> <span class='no'>grp</span>
-) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='to_kable.html'>to_kable</a></span>(<span class='kw'>escape</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='https://rdrr.io/pkg/kableExtra/man/kable_styling.html'>kable_styling</a></span>(<span class='kw'>full_width</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; <span class='error'>Error in check_strat(., data = data): </span></div></pre>
+<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>set_variable_labels</span>(<span class='no'>df</span>,
+  <span class='kw'>gfr</span> <span class='kw'>=</span> <span class='st'>'Estimated GFR'</span>,
+  <span class='kw'>sbp</span> <span class='kw'>=</span> <span class='st'>'Systolic BP'</span>
+)
+
+<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>set_variable_units</span>(<span class='no'>df</span>,
+  <span class='kw'>gfr</span> <span class='kw'>=</span> <span class='st'>'mL/min/1.73 m2'</span>,
+  <span class='kw'>sbp</span> <span class='kw'>=</span> <span class='st'>'mm Hg'</span>
+)
+
+<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>set_variable_abbrs</span>(<span class='no'>df</span>,
+  <span class='kw'>gfr</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"GFR"</span> <span class='kw'>=</span> <span class='st'>"glomerular filtration rate"</span>, <span class='st'>"min"</span> <span class='kw'>=</span> <span class='st'>'minute'</span>),
+  <span class='kw'>sbp</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"BP"</span> <span class='kw'>=</span> <span class='st'>"blood pressure"</span>)
+)
+
+<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>set_variable_notes</span>(<span class='no'>df</span>,
+  <span class='kw'>sbp</span> <span class='kw'>=</span> <span class='st'>"blood pressure was measured by trained personnel"</span>
+)
+
+<span class='fu'><a href='build_meta.html'>build_meta</a></span>(<span class='no'>df</span>)</div><div class='output co'>#&gt; $data
+#&gt; <span style='color: #555555;'># A tibble: 2 x 8</span><span>
+#&gt;   variable label         type    unit           group abbr     note     labels  
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>         </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>          </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;list&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;list&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;list&gt;</span><span>  
+#&gt; </span><span style='color: #555555;'>1</span><span> gfr      Estimated GFR numeric mL/min/1.73 m2 None  </span><span style='color: #555555;'>&lt;chr [2</span><span>~ </span><span style='color: #555555;'>&lt;chr [1</span><span>~ </span><span style='color: #555555;'>&lt;chr [1</span><span>~
+#&gt; </span><span style='color: #555555;'>2</span><span> sbp      Systolic BP   numeric mm Hg          None  </span><span style='color: #555555;'>&lt;chr [1</span><span>~ </span><span style='color: #555555;'>&lt;chr [1</span><span>~ </span><span style='color: #555555;'>&lt;chr [1</span><span>~
+#&gt; 
+#&gt; $group_levels
+#&gt; NULL
+#&gt; 
+#&gt; $var_levels
+#&gt; NULL
+#&gt; 
+#&gt; attr(,"class")
+#&gt; [1] "meta"</div><div class='input'>
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
