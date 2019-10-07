@@ -37,7 +37,11 @@
 
 <meta property="og:title" content="Set variable attributes — set_variable_labels" />
 <meta property="og:description" content="These functions allow you to embed attributes in data
-so that you only need to think about them once." />
+so that you only need to think about them once. Some functions
+may overwrite or delete attributes in data, so it is recommended
+that you create a meta data object with the build_meta function
+after you have set variable labels, groups, notes, abbreviations,
+and units." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -120,7 +124,11 @@ so that you only need to think about them once." />
 
     <div class="ref-description">
     <p>These functions allow you to embed attributes in data
-so that you only need to think about them once.</p>
+so that you only need to think about them once. Some functions
+may overwrite or delete attributes in data, so it is recommended
+that you create a <code>meta</code> data object with the <a href='build_meta.html'>build_meta</a> function
+after you have set variable labels, groups, notes, abbreviations,
+and units.</p>
     </div>
 
     <pre class="usage"><span class='fu'>set_variable_labels</span>(<span class='no'>data</span>, <span class='no'>...</span>)
@@ -138,7 +146,7 @@ so that you only need to think about them once.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>data</th>
-      <td><p>a data frame or <code><a href='https://tibble.tidyverse.org/reference/tibble.html'>tibble</a></code>.</p></td>
+      <td><p>a data frame.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -148,14 +156,15 @@ so that you only need to think about them once.</p>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>a data frame or <code><a href='https://tibble.tidyverse.org/reference/tibble.html'>tibble</a></code>.</p>
+    <p>a <a href='https://tibble.tidyverse.org/reference/tibble-package.html'>tibble</a>.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     
 <ul>
-<li><p><code><a href='tibble_one.html'>tibble_one</a></code> will handle attributes of data automatically,
-e.g., replacing variable names with variable labels, and placing variable
-acronyms (i.e., abbreviations) at the bottom of the table in a footnote.</p></li>
+<li><p><a href='tibble_one.html'>tibble_one</a> will handle attributes of data automatically,
+e.g., replacing variable names with variable labels, and placing
+variable acronyms (i.e., abbreviations) at the bottom of the
+table in a footnote.</p></li>
 <li><p>Use <code>set_variable_labels()</code> to set the values that will represent
 variables in table one.</p></li>
 <li><p>Use <code>set_variable_groups()</code> to change the
@@ -173,7 +182,7 @@ For example, writing <code>gfr_variable</code> = "estimated GFR" as an input to
 <code>set_variable_labels</code> will set the label for <code>gfr_variable</code> as the
 indicated string. Since GFR is an acronym, we would also want to use
 <code>set_variable_abbrs()</code> and say gfr_variable = c("GFR" =
-"glomerular filtration rate") (see examples for more detail).</p>
+"glomerular filtration rate") (see examples).</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
@@ -227,13 +236,16 @@ indicated string. Since GFR is an acronym, we would also want to use
       <li><a href="#examples">Examples</a></li>
     </ul>
 
+    <h2>Author</h2>
+    <p>Joseph Larmarange, author of the labelled package, is the
+author of the <code>set_variable_labels</code> function.</p>
   </div>
 </div>
 
 
       <footer>
       <div class="copyright">
-  <p>Developed by Byron C. Jaeger.</p>
+  <p>Developed by Byron Jaeger, Boyi Guo.</p>
 </div>
 
 <div class="pkgdown">

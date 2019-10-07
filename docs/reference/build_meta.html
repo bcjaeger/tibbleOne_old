@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>creates a dataset that describes the characteristics of another dataset — build_meta • tibbleOne</title>
+<title>Meta data builder — build_meta • tibbleOne</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,9 @@
 
 
 
-<meta property="og:title" content="creates a dataset that describes the characteristics of another dataset — build_meta" />
-<meta property="og:description" content="creates a dataset that describes the characteristics of another dataset" />
+<meta property="og:title" content="Meta data builder — build_meta" />
+<meta property="og:description" content="creates a dataset that describes the
+characteristics of another dataset" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -112,16 +113,18 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>creates a dataset that describes the characteristics of another dataset</h1>
+    <h1>Meta data builder</h1>
     
     <div class="hidden name"><code>build_meta.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>creates a dataset that describes the characteristics of another dataset</p>
+    <p>creates a dataset that describes the
+characteristics of another dataset</p>
     </div>
 
-    <pre class="usage"><span class='fu'>build_meta</span>(<span class='no'>data</span>, <span class='kw'>expand_binary_catgs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>max_catgs</span> <span class='kw'>=</span> <span class='fl'>10</span>)</pre>
+    <pre class="usage"><span class='fu'>build_meta</span>(<span class='no'>data</span>, <span class='kw'>expand_binary_catgs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>add_perc_to_cats</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>max_catgs</span> <span class='kw'>=</span> <span class='fl'>10</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -138,6 +141,15 @@ Columns in the meta data are based on these attributes.</p></td>
 binary categorical variables? (This only applies to binary variables.)</p></td>
     </tr>
     <tr>
+      <th>add_perc_to_cats</th>
+      <td><p>T/F, should categorical variables in
+Table 1 have a <!-- % sign following their label? Note that if -->
+the user specifies <code>include_freq</code> = <code>TRUE</code> in <a href='tibble_one.html'>tibble_one</a>,
+then the <!-- % symbol may be confusing to readers. However, -->
+when <code>include_freq</code> = <code>FALSE</code>, setting this to <code>TRUE</code>
+should clarify the table.</p></td>
+    </tr>
+    <tr>
       <th>max_catgs</th>
       <td><p>largest number of categories accepted in a factor
 variable. A warning message is printed if a factor variable
@@ -145,12 +157,30 @@ has more categories than <code>max_catg</code>.</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A list containing components of <code>data</code>, <code>group_levels</code>,
+and <code>var_levels</code>. The <code>data</code> component comprises 8 columns:</p><ul>
+<li><p>variable: variable name - this is the column name of the variable.</p></li>
+<li><p>label: variable labels - this is presented in tables</p></li>
+<li><p>type: type of variable (numeric or factor)</p></li>
+<li><p>unit: units for continuous variables</p></li>
+<li><p>group: a group identifier for each variable</p></li>
+<li><p>abbr: abbreviations associated with the label of a variable</p></li>
+<li><p>note: strings that will be place in tables as a footnote</p></li>
+<li><p>labels: labels of variables, including categories of factors.</p></li>
+</ul>
+
+<p>The <code>group_levels</code> component shows the order that groups will
+appear in the table, and <code>var_levels</code> shows the order that
+variables will appear in the table and within groups.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
+      <li><a href="#value">Value</a></li>
     </ul>
 
   </div>
@@ -159,7 +189,7 @@ has more categories than <code>max_catg</code>.</p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Byron C. Jaeger.</p>
+  <p>Developed by Byron Jaeger, Boyi Guo.</p>
 </div>
 
 <div class="pkgdown">
