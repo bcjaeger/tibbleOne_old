@@ -1,5 +1,17 @@
-#' tibbleOne: Because nobody likes making Table 1.
+#' tibbleOne: tidy characteristics tables
 #'
+#' @description In many academic papers, table 1 shows participant
+#'  characteristics, often stratified by a categorical variable
+#'  such as treatment group. There are many excellent packages
+#'  available to compute the numbers in table 1. This package
+#'  focuses on getting those numbers into a nice format that
+#'  works with R Markdown. Additionally, there is a fair amount
+#'  of diversity in researchers' preferred writing mediums.
+#'  Some may prefer LaTeX, while others want to work in Microsoft
+#'  Word. Recently, html documents have grown more common
+#'  for research papers. tibbleOne is meant to be applicable for
+#'  each of these settings, and should meet the needs of most
+#'  studies.
 #'
 #' To learn more about tibbleOne, start with the vignettes:
 #' `browseVignettes(package = "tibbleOne")`

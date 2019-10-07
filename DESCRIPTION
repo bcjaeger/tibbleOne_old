@@ -3,7 +3,7 @@ Type: Package
 Title: Table One for Latex, Word, and Html R Markdown Documents
 Version: 0.1.0
 Authors@R: c(
-    person("Byron", "Jaeger", , "bcjaeger@uab.edu", c("aut", "cre"), comment = c(ORCID = "0000-0001-7399-2299")),
+    person("Byron C.", "Jaeger", , "bcjaeger@uab.edu", c("aut", "cre"), comment = c(ORCID = "0000-0001-7399-2299")),
     person("Boyi", "Guo", role = "aut", )
     )
 Maintainer: Byron C. Jaeger <bcjaeger@uab.edu>

@@ -189,9 +189,8 @@ set_variable_units <- function(data, ...){
 }
 
 
-#' get the group attribute of a variable
-#' @param x an object with a group attribute value.
-#' @export
+# get the group attribute of a variable
+# @param x an object with a group attribute value.
 
 var_group <- function(x){
 
