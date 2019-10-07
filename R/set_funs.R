@@ -36,8 +36,6 @@
 #'  `set_variable_abbrs()` and say gfr_variable = c("GFR" =
 #'  "glomerular filtration rate") (see examples).
 #'
-#' @family set variable attributes
-#'
 #' @param data a data frame.
 #' @param ... name-value pairs of variable groups and names (see examples)
 #'
@@ -191,7 +189,7 @@ set_variable_units <- function(data, ...){
 }
 
 
-#' get the group attribute of a variable
+#' get group attributes
 #' @param x an object with a group attribute value.
 #' @export
 

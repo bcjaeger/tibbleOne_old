@@ -2,7 +2,7 @@
 % Please edit documentation in R/to_word.R
 \name{to_word}
 \alias{to_word}
-\title{pass a tibble_one object into flextable}
+\title{pass tibble_one to flextable}
 \usage{
 to_word(object, font_size = 11, use_groups = TRUE,
   indent_groups = TRUE, footnote_notation = "symbol",
@@ -29,5 +29,5 @@ to_word(object, font_size = 11, use_groups = TRUE,
 \item{...}{arguments passed to flextable function}
 }
 \description{
-pass a tibble_one object into flextable
+pass tibble_one to flextable
 }

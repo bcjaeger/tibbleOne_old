@@ -1,7 +1,7 @@
 
-#' create headers for kable objects created from `tibble_one` objects.
-#' @param table_type the type of `tibble_one` object. Valid inputs are 'single_decker', 'double_decker', and 'triple_decker'
-#' @param ... other arguments passed to `single_header`, `double_header`, or `triple_header` functions.
+# create headers for kable objects created from `tibble_one` objects.
+# @param table_type the type of `tibble_one` object. Valid inputs are 'single_decker', 'double_decker', and 'triple_decker'
+# @param ... other arguments passed to `single_header`, `double_header`, or `triple_header` functions.
 
 parse_kable_headers <- function(table_type, ...){
 
@@ -92,8 +92,8 @@ triple_header <- function(strat_data, include.pval, format=NULL){
 
 }
 
-#' add a p-value slot into the header for a kable object
-#' @param x a header vector for kable
+# add a p-value slot into the header for a kable object
+# @param x a header vector for kable
 
 add_pval_to_header <- function(x){
   x <- c(x, 1)

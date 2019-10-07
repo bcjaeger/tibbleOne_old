@@ -18,8 +18,6 @@ check_dots <- function(.dots, valid_args){
 
 }
 
-# check to make sure that input variables are correctly structured
-
 check_tibble_one_input <- function(object){
 
   # check names in object

@@ -1,5 +1,5 @@
 
-#' pass a tibble_one object into kable
+#' Pass tibble_one to kable
 #'
 #' @param object a tibble_one object
 #'

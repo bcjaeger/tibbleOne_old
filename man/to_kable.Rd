@@ -2,7 +2,7 @@
 % Please edit documentation in R/to_kable.R
 \name{to_kable}
 \alias{to_kable}
-\title{pass a tibble_one object into kable}
+\title{Pass tibble_one to kable}
 \usage{
 to_kable(object, use_groups = TRUE, indent_groups = FALSE,
   footnote_notation = "symbol", include_1st_header = TRUE,
@@ -41,5 +41,5 @@ from \code{knitr::\link{opts_current}$get('label')}.}
 }}
 }
 \description{
-pass a tibble_one object into kable
+Pass tibble_one to kable
 }

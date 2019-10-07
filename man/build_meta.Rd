@@ -2,9 +2,10 @@
 % Please edit documentation in R/build_meta.R
 \name{build_meta}
 \alias{build_meta}
-\title{creates a dataset that describes the characteristics of another dataset}
+\title{Meta data builder}
 \usage{
-build_meta(data, expand_binary_catgs = FALSE, max_catgs = 10)
+build_meta(data, expand_binary_catgs = FALSE, add_perc_to_cats = TRUE,
+  max_catgs = 10)
 }
 \arguments{
 \item{data}{a data frame with any combination of the following
@@ -14,10 +15,36 @@ Columns in the meta data are based on these attributes.}
 \item{expand_binary_catgs}{T/F, should all categories be included for
 binary categorical variables? (This only applies to binary variables.)}
 
+\item{add_perc_to_cats}{T/F, should categorical variables in
+Table 1 have a % sign following their label? Note that if
+the user specifies \code{include_freq} = \code{TRUE} in \link{tibble_one},
+then the % symbol may be confusing to readers. However,
+when \code{include_freq} = \code{FALSE}, setting this to \code{TRUE}
+should clarify the table.}
+
 \item{max_catgs}{largest number of categories accepted in a factor
 variable. A warning message is printed if a factor variable
 has more categories than \code{max_catg}.}
 }
+\value{
+A list containing components of \code{data}, \code{group_levels},
+and \code{var_levels}. The \code{data} component comprises 8 columns:
+\itemize{
+\item variable: variable name - this is the column name of the variable.
+\item label: variable labels - this is presented in tables
+\item type: type of variable (numeric or factor)
+\item unit: units for continuous variables
+\item group: a group identifier for each variable
+\item abbr: abbreviations associated with the label of a variable
+\item note: strings that will be place in tables as a footnote
+\item labels: labels of variables, including categories of factors.
+}
+
+The \code{group_levels} component shows the order that groups will
+appear in the table, and \code{var_levels} shows the order that
+variables will appear in the table and within groups.
+}
 \description{
-creates a dataset that describes the characteristics of another dataset
+creates a dataset that describes the
+characteristics of another dataset
 }

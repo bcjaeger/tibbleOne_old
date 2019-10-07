@@ -1,16 +1,18 @@
 Package: tibbleOne
 Type: Package
-Title: Table One for Latex and Html R Markdown Documents
+Title: Table One for Latex, Word, and Html R Markdown Documents
 Version: 0.1.0
-Author: person("Byron", "Jaeger", email = "bcjaeger@uab.edu",
-                  role = c("aut", "cre"))
+Authors@R: c(
+    person("Byron", "Jaeger", , "bcjaeger@uab.edu", c("aut", "cre"), comment = c(ORCID = "0000-0001-7399-2299")),
+    person("Boyi", "Guo", role = "aut", )
+    )
 Maintainer: Byron C. Jaeger <bcjaeger@uab.edu>
 Description: In many academic papers, table 1 shows participant
     characteristics, often stratified by a categorical variable
     such as treatment group. There are many excellent packages
     available to compute the numbers in table 1. This package
     focuses on getting those numbers into a nice format that 
-    works with Rmarkdown.
+    works with R Markdown.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

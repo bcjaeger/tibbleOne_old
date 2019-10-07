@@ -2,7 +2,7 @@
 % Please edit documentation in R/select_labelled.R
 \name{select_labelled}
 \alias{select_labelled}
-\title{create labels for variables in a dataframe, and then keep only the labelled columns}
+\title{Select and label variables}
 \usage{
 select_labelled(data, ...)
 }
@@ -12,5 +12,5 @@ select_labelled(data, ...)
 \item{...}{name-value pairs of variable labels}
 }
 \description{
-create labels for variables in a dataframe, and then keep only the labelled columns
+Select and label variables
 }

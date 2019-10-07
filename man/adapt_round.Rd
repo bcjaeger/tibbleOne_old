@@ -2,7 +2,7 @@
 % Please edit documentation in R/adapt_round.R
 \name{adapt_round}
 \alias{adapt_round}
-\title{round numeric values for presentation in a table}
+\title{Adaptive rounding for tables}
 \usage{
 adapt_round(x)
 }
@@ -10,5 +10,5 @@ adapt_round(x)
 \item{x}{a numeric vector}
 }
 \description{
-round numeric values for presentation in a table
+Adaptive rounding for tables
 }

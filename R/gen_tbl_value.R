@@ -126,7 +126,6 @@ median_iqr <- function(variable){
 
 }
 
-
 mean_sd<-function(variable){
 
   .mn <- try(mean(variable, na.rm = TRUE))
@@ -159,7 +158,6 @@ cmp_pval_params <- function(data, variable, ngrps) {
 
   }
 }
-
 
 cmp_pval_noparm <- function(data, variable, ngrps){
 

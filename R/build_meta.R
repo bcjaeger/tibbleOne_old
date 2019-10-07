@@ -1,5 +1,8 @@
 
-#' creates a dataset that describes the characteristics of another dataset
+#' Meta data builder
+#' @description creates a dataset that describes the
+#'   characteristics of another dataset
+#'
 #' @param data a data frame with any combination of the following
 #'   attributes: `label`, `unit`, `group`, `abbrs`, and `notes`.
 #'   Columns in the meta data are based on these attributes.
@@ -10,6 +13,13 @@
 #' @param max_catgs largest number of categories accepted in a factor
 #'   variable. A warning message is printed if a factor variable
 #'   has more categories than `max_catg`.
+#'
+#' @param add_perc_to_cats T/F, should categorical variables in
+#'   Table 1 have a % sign following their label? Note that if
+#'   the user specifies `include_freq` = `TRUE` in [tibble_one],
+#'   then the % symbol may be confusing to readers. However,
+#'   when `include_freq` = `FALSE`, setting this to `TRUE`
+#'   should clarify the table.
 #'
 #' @return A list containing components of `data`, `group_levels`,
 #'   and `var_levels`. The `data` component comprises 8 columns:

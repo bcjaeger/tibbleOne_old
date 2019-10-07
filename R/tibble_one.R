@@ -1,6 +1,6 @@
 
 
-#' make a tidy data frame with table one information
+#' Tidy characteristics data
 #' @param data a data frame
 #'
 #' @param meta_data a meta data frame. If unspecified, a meta data frame

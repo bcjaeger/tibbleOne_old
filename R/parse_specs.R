@@ -1,15 +1,15 @@
 
 
-#' specificy table values/tests
-#'
-#' @param specs_default named vector of character values.
-#'   Names should be variables, while values should all be `default`.
-#'   Only variables that are in the user-specified formula for
-#'   `tibble_one` should be included in the `specs_default` vector.
-#' @param specs_analyst named vector of character values.
-#'   Names should be variables, while values should be specs
-#'   (e.g., `mean`, `median` for values, and `params` or `noparm` for tests).
-#'
+# Parse specifications
+#
+# @param specs_default named vector of character values.
+#   Names should be variables, while values should all be `default`.
+#  Only variables that are in the user-specified formula for
+#   `tibble_one` should be included in the `specs_default` vector.
+# @param specs_analyst named vector of character values.
+#   Names should be variables, while values should be specs
+#   (e.g., `mean`, `median` for values, and `params` or `noparm` for tests).
+#
 
 parse_specs <- function(specs_default, specs_analyst){
 
@@ -41,8 +41,8 @@ parse_specs <- function(specs_default, specs_analyst){
 
 }
 
-#' specificy table values/tests.
-#' @inheritParams parse_specs
+# specificy table values/tests.
+# @inheritParams parse_specs
 
 parse_unnamed_spec <- function(specs_default, specs_analyst){
 

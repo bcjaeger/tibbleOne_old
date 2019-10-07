@@ -1,8 +1,8 @@
 
-#' add headers to flextable object using a kable header vector.
-#' @param object a flextable object
-#' @param object_data the dataset used to create `object`
-#' @param kable_header a header vector for kable objects.
+# add headers to flextable object using a kable header vector.
+# @param object a flextable object
+# @param object_data the dataset used to create `object`
+# @param kable_header a header vector for kable objects.
 
 # object = out
 # object_data = ft1
@@ -34,11 +34,11 @@ add_ft_header <- function(object, object_data, kable_header = NULL){
 }
 
 
-#' add headers to flextable object using a kable header vector.
-#' @param object a kable object
-#' @param escape T/F should special characters be ignored?
-#' @param bold T/F should the header be bold?
-#' @param header a vector header compatible with kableExtra `add_header_above`
+# add headers to flextable object using a kable header vector.
+# @param object a kable object
+# @param escape T/F should special characters be ignored?
+# @param bold T/F should the header be bold?
+# @param header a vector header compatible with kableExtra `add_header_above`
 
 add_kable_header <- function(object, escape, bold, header = NULL){
 

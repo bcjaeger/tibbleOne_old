@@ -1,19 +1,19 @@
 
-#' opposite of in operator
-#' @param x value to search for
-#' @param table object to search
-#'
+# opposite of in operator
+# @param x value to search for
+# @param table object to search
+#
 `%nin%` <- function (x, table)
   match(x, table, nomatch = 0) == 0
 
 
-#' named vector to tibble
-#'
-#' @description turn a named vector into a wide tibble.
-#'   This is similar to and connected with `tibble::enframe`.
-#'   However, the `vibble` function will make a wider versus
-#'   a longer tibble.
-#' @param vector a named vector
+# named vector to tibble
+#
+# @description turn a named vector into a wide tibble.
+#   This is similar to and connected with `tibble::enframe`.
+#   However, the `vibble` function will make a wider versus
+#   a longer tibble.
+# @param vector a named vector
 
 
 vibble <- function(vector){
@@ -29,10 +29,10 @@ vibble <- function(vector){
 }
 
 
-#' split, unlist, and trim a string based on a fixed pattern.
-#' @param string numeric vector
-#' @param pattern a fixed pattern to split by
-#'
+# split, unlist, and trim a string based on a fixed pattern.
+# @param string numeric vector
+# @param pattern a fixed pattern to split by
+#
 str_split_trim <- function(string, pattern){
 
   str_split(
@@ -44,8 +44,8 @@ str_split_trim <- function(string, pattern){
 
 }
 
-#' find indented rows
-#' @param x the variable column in a tibble_one kable data object
+# find indented rows
+# @param x the variable column in a tibble_one kable data object
 
 find_indent_rows <- function(x){
 
@@ -64,8 +64,8 @@ find_indent_rows <- function(x){
 
 }
 
-#' format p-values for tables
-#' @param pval numeric vector of p-values
+# format p-values for tables
+# @param pval numeric vector of p-values
 
 edit_pval <- function(pval){
 
@@ -85,8 +85,8 @@ edit_pval <- function(pval){
 }
 
 
-#' capitalize the first letter of a string (copied from Hmisc)
-#' @param string String to be capitalized
+# capitalize the first letter of a string (copied from Hmisc)
+# @param string String to be capitalized
 
 capitalize <- function (string)
 {

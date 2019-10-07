@@ -49,7 +49,7 @@
 #'
 #' @importFrom dplyr select mutate filter group_by top_n pull mutate_if
 #'   left_join bind_rows case_when slice select_at everything arrange
-#'   rename
+#'   rename if_else
 #'
 "_PACKAGE"
 

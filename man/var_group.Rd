@@ -2,7 +2,7 @@
 % Please edit documentation in R/set_funs.R
 \name{var_group}
 \alias{var_group}
-\title{get the group attribute of a variable}
+\title{get group attributes}
 \usage{
 var_group(x)
 }
@@ -10,5 +10,5 @@ var_group(x)
 \item{x}{an object with a group attribute value.}
 }
 \description{
-get the group attribute of a variable
+get group attributes
 }

@@ -1,5 +1,5 @@
 
-#' round numeric values for presentation in a table
+#' Adaptive rounding for tables
 #' @param x a numeric vector
 #' @export
 

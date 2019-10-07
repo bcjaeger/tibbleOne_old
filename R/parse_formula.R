@@ -4,8 +4,8 @@ is_two_sided <- function(formula){
   attr(terms(formula), 'response') == 1
 }
 
-#' easy lists of things
-#' @param things vector containing things to list
+# easy lists of things
+# @param things vector containing things to list
 list_things <- function(things){
 
   glue_collapse(things, sep = ', ', last = ' and ')

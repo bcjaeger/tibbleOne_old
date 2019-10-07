@@ -92,4 +92,3 @@ build_meta(df)
 Joseph Larmarange, author of the \link{labelled} package, is the
 author of the \code{set_variable_labels} function.
 }
-\concept{set variable attributes}

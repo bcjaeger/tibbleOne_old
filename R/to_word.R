@@ -1,7 +1,7 @@
 
 # source("R/hline_header.R")
 
-#' pass a tibble_one object into flextable
+#' pass tibble_one to flextable
 #' @param object a tibble_one object
 #' @param font_size the size of font in the table.
 #' @param use_groups T/F, should rows be grouped?

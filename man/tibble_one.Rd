@@ -2,7 +2,7 @@
 % Please edit documentation in R/tibble_one.R
 \name{tibble_one}
 \alias{tibble_one}
-\title{make a tidy data frame with table one information}
+\title{Tidy characteristics data}
 \usage{
 tibble_one(data, meta_data = NULL, formula = NULL, row_vars = NULL,
   strat = NULL, by = NULL, specs_table_vals = NULL,
@@ -53,7 +53,7 @@ stratification.}
 categorical variables?}
 }
 \description{
-make a tidy data frame with table one information
+Tidy characteristics data
 }
 \examples{
 data("pbc_tbl1")

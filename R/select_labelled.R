@@ -1,9 +1,8 @@
 
-#' create labels for variables in a dataframe, and then keep only the labelled columns
+#' Select and label variables
 #' @param data a data frame
 #' @param ... name-value pairs of variable labels
 #' @export
-
 select_labelled <- function(data, ...){
 
   .dots <- list(...)
@@ -12,7 +11,7 @@ select_labelled <- function(data, ...){
 
   new_data <- data
 
-  for(i in 1:.length){
+  for(i in seq(.length)){
     var_label( new_data[[ .names[i] ]] ) <- .dots[[i]]
   }
 

@@ -9,3 +9,12 @@
 To learn more about tibbleOne, start with the vignettes:
 \code{browseVignettes(package = "tibbleOne")}
 }
+\author{
+\strong{Maintainer}: Byron Jaeger \email{bcjaeger@uab.edu} (0000-0001-7399-2299)
+
+Authors:
+\itemize{
+  \item Boyi Guo
+}
+
+}

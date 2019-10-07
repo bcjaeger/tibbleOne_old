@@ -1,13 +1,13 @@
 
-#' flextable footers
-#'
-#' @description determine which type of symbols to use
-#'   for flextable footnotes
-#'
-#' @param footnote_notation character value indicating footnote
-#'   symbols to use in tables. Eligible values are `symbol`,
-#'   `number`, and `alphabet`.
-#'
+# flextable footers
+#
+# @description determine which type of symbols to use
+#   for flextable footnotes
+#
+# @param footnote_notation character value indicating footnote
+#   symbols to use in tables. Eligible values are `symbol`,
+#   `number`, and `alphabet`.
+#
 
 parse_flex_footers <- function(footnote_notation){
 
