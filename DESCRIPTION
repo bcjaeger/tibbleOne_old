@@ -3,10 +3,10 @@ Type: Package
 Title: Table One for Latex, Word, and Html R Markdown Documents
 Version: 0.1.0
 Authors@R: c(
-    person("Byron C.", "Jaeger", , "bcjaeger@uab.edu", c("aut", "cre"), comment = c(ORCID = "0000-0001-7399-2299")),
+    person("Byron", "Jaeger", , "bcjaeger@uab.edu", c("aut", "cre"), comment = c(ORCID = "0000-0001-7399-2299")),
     person("Boyi", "Guo", role = "aut", )
     )
-Maintainer: Byron C. Jaeger <bcjaeger@uab.edu>
+Maintainer: Byron Jaeger <bcjaeger@uab.edu>
 Description: In many academic papers, table 1 shows participant
     characteristics, often stratified by a categorical variable
     such as treatment group. There are many excellent packages
