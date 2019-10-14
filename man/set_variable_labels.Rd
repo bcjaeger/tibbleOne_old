@@ -24,7 +24,8 @@ set_variable_units(data, ...)
 \item{...}{name-value pairs of variable groups and names (see examples)}
 }
 \value{
-a \link[tibble:tibble-package]{tibble}.
+a \link[tibble:tibble-package]{tibble}, adorned with additional
+attributes based on user input.
 }
 \description{
 These functions allow you to embed attributes in data
@@ -59,6 +60,11 @@ indicated string. Since GFR is an acronym, we would also want to use
 \code{set_variable_abbrs()} and say gfr_variable = c("GFR" =
 "glomerular filtration rate") (see examples).
 }
+\note{
+The \code{set_variable_labels} function in \code{tibbleOne} is a wrapper
+of the \link[labelled:set_variable_labels]{labelled} function,
+developed by Joseph Larmarange.
+}
 \examples{
 
 df <- data.frame(
@@ -87,8 +93,4 @@ df <- set_variable_notes(df,
 
 build_meta(df)
 
-}
-\author{
-Joseph Larmarange, author of the \link{labelled} package, is the
-author of the \code{set_variable_labels} function.
 }

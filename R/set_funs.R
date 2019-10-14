@@ -39,10 +39,12 @@
 #' @param data a data frame.
 #' @param ... name-value pairs of variable groups and names (see examples)
 #'
-#' @return a [tibble][tibble::tibble-package].
+#' @return a [tibble][tibble::tibble-package], adorned with additional
+#'   attributes based on user input.
 #'
-#' @author Joseph Larmarange, author of the [labelled] package, is the
-#'   author of the `set_variable_labels` function.
+#' @note The `set_variable_labels` function in `tibbleOne` is a wrapper
+#'   of the [labelled][labelled::set_variable_labels()] function,
+#'   developed by Joseph Larmarange.
 #'
 #' @examples
 #'

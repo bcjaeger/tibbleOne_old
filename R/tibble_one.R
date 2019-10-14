@@ -43,6 +43,9 @@
 #' @param include_freq T/F, should frequency values be included for
 #'   categorical variables?
 #'
+#' @return a [tibble][tibble::tibble-package] containing summary values
+#'   that describe characteristics of observations in `data`.
+#'
 #' @export
 #'
 #' @examples

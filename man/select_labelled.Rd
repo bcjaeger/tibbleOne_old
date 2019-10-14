@@ -11,6 +11,10 @@ select_labelled(data, ...)
 
 \item{...}{name-value pairs of variable labels}
 }
+\value{
+a data frame containing the columns indicated by \code{...},
+adorned with attributes based on a user's specified labels.
+}
 \description{
 Select and label variables
 }

@@ -9,6 +9,12 @@ adapt_round(x)
 \arguments{
 \item{x}{a numeric vector}
 }
+\value{
+a character vector comprising rounded values.
+}
 \description{
 Adaptive rounding for tables
+}
+\examples{
+adapt_round(c(0.12, 10.12, 100.12))
 }

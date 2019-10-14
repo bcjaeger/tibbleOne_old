@@ -52,6 +52,10 @@ stratification.}
 \item{include_freq}{T/F, should frequency values be included for
 categorical variables?}
 }
+\value{
+a \link[tibble:tibble-package]{tibble} containing summary values
+that describe characteristics of observations in \code{data}.
+}
 \description{
 Tidy characteristics data
 }

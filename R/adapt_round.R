@@ -1,7 +1,11 @@
 
 #' Adaptive rounding for tables
 #' @param x a numeric vector
+#' @return a character vector comprising rounded values.
+#' @examples
+#' adapt_round(c(0.12, 10.12, 100.12))
 #' @export
+
 
 adapt_round <- function(x){
 
