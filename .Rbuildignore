@@ -4,3 +4,4 @@
 docs
 vignettes
 ^\.travis\.yml$
+create_tibbleOne_datafiles.R
